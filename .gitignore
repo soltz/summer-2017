@@ -40,3 +40,7 @@ Thumbs.db
 # Project Directory Files To Ignore #
 #####################################
 daily_report/
+
+# Associated Source To Ignore #
+###############################
+pythia/
