@@ -44,3 +44,4 @@ daily_report/
 # Associated Source To Ignore #
 ###############################
 pythia/
+data/
