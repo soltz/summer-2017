@@ -1,25 +1,33 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import math
 import pythia8
 import getopt, sys
 
 def usage():
-    print 'Generates output below for pythia jets in trento background with slowjet reconstruction:'
-    print 'Usage: python output_pythia_trento_slowjet.py [options]'
-    print 'Writes output to output.txt, see header for format.'
-    print '   -h, --help       : this message'
-    print '   -f, --file       = set trento data file [../../../data/AuAu_200GeV_100k.txt] or turn [off]'
-    print '   -e, --eCM        = pythia beam center-of-mass energy (GeV) [200.0]'
-    print '   -n, --nevt       = number of pythia + trento events to generate [10]'
-    print '   -c, --QCDoff     : turn pythia hard QCD processes off'
-    print '   -q, --QEDoff     : turn pythia hard QED processes off'
-    print '   -o, --output     = output file [output.txt]'
-    print '   -s, --seed       = pythia initial random number seed [-1]'
-    print '   -p, --SJpTmin    = slowjet minimum pT [10]'
-    print '   -r, --SJradius   = slowJet radius [0.5]'
-    print '   -u, --quench     = scaling factor for momentum of non-photon jet, QED only [1.0]'
-    print '   -y, --pTHatMin   = pythia minimum jet pT [20.0]'
-    print '   -z, --pTHatMax   = pythia maximum jet pT [25.0]'
+    output = '''
+Generates output below for pythia jets in trento background with slowjet reconstruction:
+
+Usage: python output_pythia_trento_slowjet.py [options]
+
+Writes output to output.txt, see header for format.
+
+Options:
+    -h, --help       : this message
+    -f, --file       = set trento data file [../data/AuAu_200GeV_100k.txt] or turn [off]
+    -e, --eCM        = pythia beam center-of-mass energy (GeV) [200.0]
+    -n, --nevt       = number of pythia + trento events to generate [10]
+    -c, --QCDoff     : turn pythia hard QCD processes off
+    -q, --QEDoff     : turn pythia hard QED processes off
+    -o, --output     = output file [output.txt]
+    -s, --seed       = pythia initial random number seed [-1]
+    -p, --SJpTmin    = slowjet minimum pT [10]
+    -r, --SJradius   = slowJet radius [0.5]
+    -u, --quench     = scaling factor for momentum of non-photon jet, QED only [1.0]
+    -y, --pTHatMin   = pythia minimum jet pT [20.0]
+    -z, --pTHatMax   = pythia maximum jet pT [25.0]
+    '''
+    print(output)
 
 def main():
 
@@ -28,14 +36,14 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], 'hf:e:n:cqo:s:p:r:u:y:z:l', \
               ['help','file=','eCM=','nevt=','pTHatMax=','pTHatMin=','output=','seed=','QCD','QED','quench=','SJpTmin=','SJradius='])
     except getopt.GetoptError, err:
-        print str(err) # will print something like 'option -a not recognized'
+        print(err) # will print something like 'option -a not recognized'
         usage()
         sys.exit(2)
 
     trento_on = True
     trento_seed = 0
     pythia_on = True
-    trento_file = '../../../data/AuAu_200GeV_100k.txt'
+    trento_file = '../data/AuAu_200GeV_100k.txt'
     
     # pythia settings
     eCM  = 200.0
@@ -95,7 +103,7 @@ def main():
         try:
             data = np.loadtxt(trento_file)
         except:
-            print '\nFile ' + trento_file + ' not found, exiting...' + '\n'
+            print('\nFile ' + trento_file + ' not found, exiting...' + '\n')
             sys.exit()
             
         # conversion from fit to PHENIX 200 GeV data
@@ -182,7 +190,7 @@ def main():
                 gammajet = pythia.event[6]
 
             if gammajet.id() != 22:
-                print 'Danger Will Robinson!'
+                print('Danger Will Robinson!')
 
         #   Need to introduce some checks on hard-scattered particle assignments
             
