@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import sys
+import os
 import math
 import pythia8
 import numpy as np
@@ -51,10 +52,7 @@ args = parser.parse_args()
 
 # Check validity of arguments
 if args.file != 'off':
-    try:
-        with open(args.file, 'r') as f:
-            pass
-    except FileNotFoundError:
+    if not os.path.isfile(args.file):
         raise ValueError('trento file {} not found.'.format(args.file))
 
 if args.eCM <= 0.0:
@@ -118,8 +116,12 @@ if trento_file == 'off':
 else:
     try:
         data = np.loadtxt(trento_file)
-    except FileNotFoundError:
-        print('\nFile ' + trento_file + ' not found, exiting...' + '\n')
+    except Exception as e:
+        # At this point the file should exist
+        # Being unable to open the file means it is being used
+        # Or the user does not have permission to open it
+        print('Unable to open trento file.')
+        raise e
         sys.exit()
 
     # Conversion from fit to PHENIX 200 GeV data
