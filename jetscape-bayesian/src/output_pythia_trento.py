@@ -227,7 +227,8 @@ if filter_results:
     g.write(header)
 
 # Loop over events, start with pythia then add trento to pythia event
-for i in range(trento_seed, trento_seed + nevt):
+i = trento_seed
+while i < trento_seed + nevt:
     problem = False
 
     # Reset event data ???
@@ -422,6 +423,7 @@ for i in range(trento_seed, trento_seed + nevt):
         g.write(output)
     else:
         f.write(output)
+        i += 1
 
 g.close()
-f.write()
+f.close()
