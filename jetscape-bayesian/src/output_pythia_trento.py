@@ -8,35 +8,6 @@ import numpy as np
 import argparse
 
 
-def usage():
-    output = '''
-Generates output below for pythia jets in trento background with
-slowjet reconstruction:
-
-Usage: python output_pythia_trento_slowjet.py [options]
-
-Writes output to output.txt, see header for format.
-
-Options:
-    -h, --help       : this message
-    -f, --file       = set trento data file [../data/AuAu_200GeV_100k.txt]
-                       or turn [off]
-    -e, --eCM        = pythia beam center-of-mass energy (GeV) [200.0]
-    -n, --nevt       = number of pythia + trento events to generate [10]
-    -c, --QCDoff     : turn pythia hard QCD processes off
-    -q, --QEDoff     : turn pythia hard QED processes off
-    -o, --output     = output file [output.txt]
-    -s, --seed       = pythia initial random number seed [-1]
-    -p, --SJpTmin    = slowjet minimum pT [10]
-    -r, --SJradius   = slowJet radius [0.5]
-    -u, --quench     = scaling factor for momentum of non-photon jet,
-                       QED only [1.0]
-    -y, --pTHatMin   = pythia minimum jet pT [20.0]
-    -z, --pTHatMax   = pythia maximum jet pT [25.0]
-    '''
-    print(output)
-
-
 prog_description = '''
 Generates output below for pythia jets in trento background with
 slowjet reconstruction.'''.replace('\n', '', 1)
