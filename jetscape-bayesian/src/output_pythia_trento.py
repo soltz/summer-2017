@@ -38,75 +38,120 @@ Options:
     print(output)
 
 
+prog_description = '''
+Generates output below for pythia jets in trento background with
+slowjet reconstruction.'''.replace('\n', '', 1)
+prog_epilogue = 'Writes output to output.txt, see header for format.'
+
+# Initialize argument parser
+parser = argparse.ArgumentParser(
+    description=prog_description,
+    epilog=prog_epilogue,
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+# Add arguments
+parser.add_argument('-f', '--file', type=str,
+                    default='../data/AuAu_200GeV_100k.txt',
+                    help='path to trento data file or turn \"off\"')
+parser.add_argument('-e', '--eCM', type=float, default=200.0,
+                    help='PYTHIA beam center-of-mass energy (in GeV)')
+parser.add_argument('-n', '--nevt', type=int, default=10,
+                    help='number of PYTHIA and trento events to generate')
+parser.add_argument('-c', '--QCDoff', action='store_true',
+                    help='turn PYTHIA hard QCD processes off')
+parser.add_argument('-q', '--QEDoff', action='store_true',
+                    help='turn PYTHIA hard QED processes off')
+parser.add_argument('-o', '--output', type=str, default='output.txt',
+                    help='path to output file')
+parser.add_argument('-s', '--seed', type=int, default=-1,
+                    help='seed for random numbers in PYTHIA')
+parser.add_argument('-p', '--SJpTmin', type=int, default=10,
+                    help='slowjet minimum pT')
+parser.add_argument('-r', '--SJradius', type=float, default=0.5,
+                    help='slowjet radius')
+parser.add_argument('-u', '--quench', type=float, default=1.0,
+                    help='scaling factor for momentum of non-photon jet')
+parser.add_argument('-y', '--pTHatMin', type=float, default=20.0,
+                    help='PYTHIA minimum jet pT')
+parser.add_argument('-z', '--pTHatMax', type=float, default=25.0,
+                    help='PYTHIA maximum jet pT')
+
+# Parse arguments
+args = parser.parse_args()
+
+# Check validity of arguments
+if args.file != 'off':
+    try:
+        with open(args.file, 'r') as f:
+            pass
+    except FileNotFoundError:
+        raise ValueError('trento file {} not found.'.format(args.file))
+
+if args.eCM <= 0.0:
+    raise ValueError('Beam energy must be positive')
+
+if args.nevt <= 0:
+    raise ValueError('Number of events must be positive')
+
+if args.SJpTmin < 0:
+    raise ValueError('Minimum slowjet pT must be non-negative')
+
+if args.SJradius <= 0:
+    raise ValueError('slowjet radius must be positive')
+
+if args.quench <= 0 or args.quench > 1.0:
+    raise ValueError('Quench factor must be between 0 and 1')
+
+if args.pTHatMin < 0:
+    raise ValueError('Minimum pT for PYTHIA must be non-negative')
+
+if args.pTHatMax <= args.pTHatMin:
+    raise ValueError('Maximum pT must be larger than minimum')
+
+# Check last to prevent changing files on the system when other
+# arguments might still cause a premature exit
+try:
+    f = open(args.output, 'w')
+except Exception:
+    raise ValueError('Error while opening output file.')
+
 # Parse command line and set defaults
 #   (see http://docs.python.org/library/getopt.html)
 # If unrecognized option is passed, a GetoptError will be raised and
 # caught. The error will be shown as 'option -a not recognized',
 # followed by the proper usage. Then the program exits.
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hf:e:n:cqo:s:p:r:u:y:z:l',
-                               ['help', 'file=', 'eCM=', 'nevt=',
-                                'pTHatMax=', 'pTHatMin=', 'output=',
-                                'seed=', 'QCD', 'QED', 'quench=',
-                                'SJpTmin=', 'SJradius='])
-except getopt.GetoptError as err:
-    print(err)
-    usage()
-    sys.exit(2)
+# try:
+#     opts, args = getopt.getopt(sys.argv[1:], 'hf:e:n:cqo:s:p:r:u:y:z:l',
+#                                ['help', 'file=', 'eCM=', 'nevt=',
+#                                 'pTHatMax=', 'pTHatMin=', 'output=',
+#                                 'seed=', 'QCD', 'QED', 'quench=',
+#                                 'SJpTmin=', 'SJradius='])
+# except getopt.GetoptError as err:
+#     print(err)
+#     usage()
+#     sys.exit(2)
 
 # Default settings for Trento data
 trento_on = True
 trento_seed = 0
 pythia_on = True
-trento_file = '../data/AuAu_200GeV_100k.txt'
+trento_file = args.file
 
 # PYTHIA settings (default values)
-eCM = 200.0
-pTHatMin = 20.0
-pTHatMax = 25.0
-seed = -1
-QCD = 'on'
-QED = 'on'
-quench = 1.0
-nevt = 10
-SJpTmin = 10
-SJradius = 0.5
-output = 'output.txt'
-
-# Iterate over passed options and override defaults where applicable
-for o, a in opts:
-    if o in ('-h', '--help'):
-        usage()
-        sys.exit()
-    elif o in ('-f', '--file'):
-        trento_file = str(a)
-    elif o in ('-e', '--eCM'):
-        eCM = float(a)
-    elif o in ('-n', '--nevt'):
-        nevt = int(a)
-    elif o in ('-y', '--pTHatMin'):
-        pTHatMin = float(a)
-    elif o in ('-z', '--pTHatMax'):
-        pTHatMax = float(a)
-    elif o in ('-o', '--output'):
-        output = a
-    elif o in ('-s', '--seed'):
-        seed = int(a)
-    elif o in ('-c', '--QCDoff'):
-        QCD = 'off'
-    elif o in ('-q', '--QEDoff'):
-        QED = 'off'
-    elif o in ('-u', '--quench'):
-        quench = float(a)
-    elif o in ('-p', '--SJpTmin'):
-        SJpTmin = float(a)
-    elif o in ('-r', '--SJradius'):
-        SJradius = float(a)
-    else:
-        raise Exception('unhandled option')
+eCM = args.eCM
+pTHatMin = args.pTHatMin
+pTHatMax = args.pTHatMax
+seed = args.seed
+QCD = not args.QCDoff
+QED = not args.QEDoff
+quench = args.quench
+nevt = args.nevt
+SJpTmin = args.SJpTmin
+SJradius = args.SJradius
+output = args.output
 
 # PYTHIA without QCD and QED does nothing ???
-if (QCD == 'off') and (QED == 'off'):
+if args.QCDoff and args.QEDoff:
     pythia_on = False
 
 # Load trento data for 100,000 Au Au events
