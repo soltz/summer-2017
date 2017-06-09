@@ -5,7 +5,6 @@ import sys
 import math
 import pythia8
 import numpy as np
-import getopt
 import argparse
 
 
@@ -114,22 +113,6 @@ try:
     f = open(args.output, 'w')
 except Exception:
     raise ValueError('Error while opening output file.')
-
-# Parse command line and set defaults
-#   (see http://docs.python.org/library/getopt.html)
-# If unrecognized option is passed, a GetoptError will be raised and
-# caught. The error will be shown as 'option -a not recognized',
-# followed by the proper usage. Then the program exits.
-# try:
-#     opts, args = getopt.getopt(sys.argv[1:], 'hf:e:n:cqo:s:p:r:u:y:z:l',
-#                                ['help', 'file=', 'eCM=', 'nevt=',
-#                                 'pTHatMax=', 'pTHatMin=', 'output=',
-#                                 'seed=', 'QCD', 'QED', 'quench=',
-#                                 'SJpTmin=', 'SJradius='])
-# except getopt.GetoptError as err:
-#     print(err)
-#     usage()
-#     sys.exit(2)
 
 # Default settings for Trento data
 trento_on = True
