@@ -4,10 +4,13 @@ from __future__ import print_function
 import sys
 import os
 import math
+import random
 import pythia8
 import numpy as np
 import argparse
 
+
+# -------------------------- ARGUMENT PARSING ------------------------ #
 
 prog_description = '''
 Generates output below for pythia jets in trento background with
@@ -94,8 +97,9 @@ eCM = args.eCM
 pTHatMin = args.pTHatMin
 pTHatMax = args.pTHatMax
 seed = args.seed
-QCD = not args.QCDoff
-QED = not args.QEDoff
+bool_on_dict = { False: 'on', True: 'off'}
+QCD = bool_on_dict[args.QCDoff]
+QED = bool_on_dict[args.QEDoff]
 quench = args.quench
 nevt = args.nevt
 SJpTmin = args.SJpTmin
@@ -106,7 +110,9 @@ output = args.output
 if args.QCDoff and args.QEDoff:
     pythia_on = False
 
-# Load trento data for 100,000 Au Au events
+# ------------------------- DATA LOADING ----------------------------- #
+
+# Load/generate trento data for 100,000 Au Au events
 if trento_file == 'off':
     trento_on = False
     b = np.zeros(1e5)
@@ -131,7 +137,10 @@ else:
     b = data[:, 1]
     Npart = data[:, 2]
     mult = mult_scale * data[:, 3]
+    print(mult)
     e2 = data[:, 4]
+
+# -------------------------- PHYSICAL CONSTANTS ---------------------- #
 
 # temperature in GeV
 T = 0.15
@@ -147,6 +156,8 @@ rho_0 = 0.85
 # e2 scaling parameter for elliptic flow
 # from Alver and Roland, PRC81.054905 (2010), fig 4
 rho_2 = 0.15
+
+# --------------------------- PYTHIA RUNS ---------------------------- #
 
 # Initialize Pythia
 pythia = pythia8.Pythia()
@@ -194,13 +205,16 @@ for i in range(trento_seed, trento_seed + nevt):
         # Generate new PYTHIA event ???
         pythia.next()
 
-        # Initial hard partons are stored in pythia.event [5] and [6]
-        daughters5 = []
-        daughters5.extend(pythia.event[5].daughterList())
-        for j in daughters5:
-            if j != 0:
-                daughters5.extend(pythia.event[j].daughterList())
-        daughters6 = []
+        # Initial hard partons are stored in pythia.event [5] and [6] UNUSED
+        # daughters5 = []
+        # daughters5.extend(pythia.event[5].daughterList())
+        # for j in daughters5:
+        #     if j != 0:
+        #         daughters5.extend(pythia.event[j].daughterList())
+        # daughters6 = []
+
+        # for j in range(pythia.event.size()):
+        #     print('Event {}, particle {}: id = {} code = {}'.format(i, j, pythia.event[j].id(), pythia.event[j].status()))
 
         # Check for gamma in [5] position
         # For QCD events quarkjet is always [5]
@@ -214,20 +228,38 @@ for i in range(trento_seed, trento_seed + nevt):
         if gammajet.id() != 22:
             print('Danger, Will Robinson!')
 
+        # Pick pure and quenched jets
+        # If there is a gamma jet, make that pure
+        # Otherwise, pick one of the parton jets to be pure
+        # Initial hard partons are stored in pythia.event [5] and [6]
+        if pythia.event[5].id() == 22:
+            purejet = pythia.event[5]
+            quenchedjet = pythia.event[6]
+        elif pythia.event[6].id() == 22:
+            purejet = pythia.event[6]
+            quenchedjet = pythia.event[5]
+        else:
+            if random.randint(1, 2) == 1:
+                purejet = pythia.event[5]
+                quenchedjet = pythia.event[6]
+            else:
+                purejet = pythia.event[6]
+                quenchedjet = pythia.event[5]
+
         # TODO introduce checks on hard-scattered particle assignments
 
-        # Rescale daughters by momentum, not same as energy
+        # Rescale quenchedjet daughters by momentum, not same as energy
         daughters = []
-        daughters.extend(quarkjet.daughterList())
+        daughters.extend(quenchedjet.daughterList())
         for j in daughters:
             if j != 0:
                 daughters.extend(pythia.event[j].daughterList())
 
         for j in daughters:
             prt = pythia.event[j]
-            px = quench*prt.px()
-            py = quench*prt.py()
-            pz = quench*prt.pz()
+            px = quench * prt.px()
+            py = quench * prt.py()
+            pz = quench * prt.pz()
             prt_mass = prt.m()
             prt_e = (prt_mass**2 + px**2 + py**2 + pz**2)**0.5
             prt.px(px)
@@ -332,14 +364,14 @@ for i in range(trento_seed, trento_seed + nevt):
                  + '{: 5.3f}'.format(e2[i])
 
     if pythia_on:
-        gamma_output = '{: 3d}'.format(gammajet.id()) \
-                     + '{: 5.3f}'.format(gammajet.pT()) \
-                     + '{: 8.3f}'.format(gammajet.eta()) \
-                     + '{: 8.3f}'.format(gammajet.phi())
-        quark_output = '{: 3d}'.format(quarkjet.id()) \
-                     + '{: 5.3f}'.format(quarkjet.pT()) \
-                     + '{: 8.3f}'.format(quarkjet.eta()) \
-                     + '{: 8.3f}'.format(quarkjet.phi())
+        gamma_output = '{: 3d}'.format(purejet.id()) \
+                     + '{: 5.3f}'.format(purejet.pT()) \
+                     + '{: 8.3f}'.format(purejet.eta()) \
+                     + '{: 8.3f}'.format(purejet.phi())
+        quark_output = '{: 3d}'.format(quenchedjet.id()) \
+                     + '{: 5.3f}'.format(quenchedjet.pT()) \
+                     + '{: 8.3f}'.format(quenchedjet.eta()) \
+                     + '{: 8.3f}'.format(quenchedjet.phi())
         pythia_output = gamma_output + quark_output
     else:
         pythia_output = '0 0 0 0 0 0 0 0'
