@@ -20,22 +20,26 @@ prog_epilogue = 'Writes output to output.txt, see header for format.'
 # Initialize argument parser
 parser = argparse.ArgumentParser(
     description=prog_description,
+    usage='%(prog)s [options]',
     epilog=prog_epilogue,
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # Add arguments
-parser.add_argument('-f', '--file', type=str,
+parser.add_argument('-f', '--file', type=str, metavar='TRENTO_FILE',
                     default='../data/AuAu_200GeV_100k.txt',
                     help='path to trento data file or turn \"off\"')
 parser.add_argument('-e', '--eCM', type=float, default=200.0,
+                    metavar='BEAM_ENERGY',
                     help='PYTHIA beam center-of-mass energy (in GeV)')
 parser.add_argument('-n', '--nevt', type=int, default=10,
+                    metavar='NUMBER_OF_EVENTS',
                     help='number of PYTHIA and trento events to generate')
 parser.add_argument('-c', '--QCDoff', action='store_true',
                     help='turn PYTHIA hard QCD processes off')
 parser.add_argument('-q', '--QEDoff', action='store_true',
                     help='turn PYTHIA hard QED processes off')
-parser.add_argument('-o', '--output', type=str, default='output.txt',
+parser.add_argument('-o', '--output', type=str, metavar='OUTPUT_FILE',
+                    default='output.txt',
                     help='path to output file')
 parser.add_argument('-s', '--seed', type=int, default=-1,
                     help='seed for random numbers in PYTHIA')
@@ -43,12 +47,18 @@ parser.add_argument('-p', '--SJpTmin', type=int, default=10,
                     help='slowjet minimum pT')
 parser.add_argument('-r', '--SJradius', type=float, default=0.5,
                     help='slowjet radius')
-parser.add_argument('-u', '--quench', type=float, default=1.0,
+parser.add_argument('-u', '--quench', type=float, metavar='QUENCH_FACTOR',
+                    default=1.0,
                     help='scaling factor for momentum of non-photon jet')
 parser.add_argument('-y', '--pTHatMin', type=float, default=20.0,
                     help='PYTHIA minimum jet pT')
 parser.add_argument('-z', '--pTHatMax', type=float, default=25.0,
                     help='PYTHIA maximum jet pT')
+parser.add_argument('-w', '--filter', action='store_true',
+                    help='Enable filtering results')
+parser.add_argument('-x', '--filter-file', type=str,
+                    metavar='FILTER_FILE', default='filter.txt',
+                    help='Set path to file for filtered results')
 
 # Parse arguments
 args = parser.parse_args()
@@ -79,12 +89,30 @@ if args.pTHatMin < 0:
 if args.pTHatMax <= args.pTHatMin:
     raise ValueError('Maximum pT must be larger than minimum')
 
+if args.output == args.file:
+    raise ValueError('Cannot read from and output to same file')
+
+if args.filter and args.filter_file == args.output:
+    raise ValueError('Filter file cannot be the same as output file')
+
+if args.filter and args.filter_file == args.file:
+    raise ValueError('Cannot read from and filter to the same file')
+
+if not args.filter and args.filter_file != 'filter.txt':
+    print('Warning: Filter flag is not set so filter file will not be created')
+
 # Check last to prevent changing files on the system when other
 # arguments might still cause a premature exit
 try:
     f = open(args.output, 'w')
 except Exception:
-    raise ValueError('Error while opening output file.')
+    raise ValueError('Error while opening output file')
+
+if args.filter:
+    try:
+        g = open(args.filter_file, 'w')
+    except Exception:
+        raise ValueError('Error while opening file for filtered results')
 
 # Default settings for Trento data
 trento_on = True
@@ -105,6 +133,8 @@ nevt = args.nevt
 SJpTmin = args.SJpTmin
 SJradius = args.SJradius
 output = args.output
+filter_results = args.filter
+filter_file = args.filter_file
 
 # PYTHIA without QCD and QED does nothing ???
 if args.QCDoff and args.QEDoff:
@@ -137,7 +167,6 @@ else:
     b = data[:, 1]
     Npart = data[:, 2]
     mult = mult_scale * data[:, 3]
-    print(mult)
     e2 = data[:, 4]
 
 # -------------------------- PHYSICAL CONSTANTS ---------------------- #
@@ -193,11 +222,13 @@ header = '''# Input parameters: to be listed here
 # iev mult xgj quench b Np e2   part1 pT eta phi part2 pT eta phi   Njets pT eta phi pT eta phi
 '''
 
-f = open(output, 'w')
 f.write(header)
+if filter_results:
+    g.write(header)
 
 # Loop over events, start with pythia then add trento to pythia event
 for i in range(trento_seed, trento_seed + nevt):
+    problem = False
 
     # Reset event data ???
     pythia.event.reset()
@@ -212,21 +243,6 @@ for i in range(trento_seed, trento_seed + nevt):
         #     if j != 0:
         #         daughters5.extend(pythia.event[j].daughterList())
         # daughters6 = []
-
-        # for j in range(pythia.event.size()):
-        #     print('Event {}, particle {}: id = {} code = {}'.format(i, j, pythia.event[j].id(), pythia.event[j].status()))
-
-        # Check for gamma in [5] position
-        # For QCD events quarkjet is always [5]
-        if pythia.event[5].name() == 'gamma':
-            gammajet = pythia.event[5]
-            quarkjet = pythia.event[6]
-        else:
-            quarkjet = pythia.event[5]
-            gammajet = pythia.event[6]
-
-        if gammajet.id() != 22:
-            print('Danger, Will Robinson!')
 
         # Pick pure and quenched jets
         # If there is a gamma jet, make that pure
@@ -245,6 +261,12 @@ for i in range(trento_seed, trento_seed + nevt):
             else:
                 purejet = pythia.event[6]
                 quenchedjet = pythia.event[5]
+
+        # Get PYTHIA event multiplicity
+        pythia_mult = 0
+        for j in range(pythia.event.size()):
+            if pythia.event[j].isFinal():
+                pythia_mult += 1
 
         # TODO introduce checks on hard-scattered particle assignments
 
@@ -297,6 +319,7 @@ for i in range(trento_seed, trento_seed + nevt):
                              'pbar': (0.938, -2212),
                              'n': (0.940, 2112),
                              'nbar': (0.940, -2112)}
+
             # particle selected randomly
             if r5 <= 0.11:
                 particle_name = 'pi+'
@@ -356,7 +379,7 @@ for i in range(trento_seed, trento_seed + nevt):
     # Prepare output, stats include trento information
     # (values set to zero if not turned on)
     stats_output = '{: 5d}'.format(i) \
-                 + '{: 6d}'.format(int(mult[i])) \
+                 + '{: 6d}'.format(int(mult[i]) + pythia_mult) \
                  + '{: 5.3f}'.format(xgj) \
                  + '{: 4.2f}'.format(quench) \
                  + '{: 6.2f}'.format(b[i]) \
@@ -375,6 +398,7 @@ for i in range(trento_seed, trento_seed + nevt):
         pythia_output = gamma_output + quark_output
     else:
         pythia_output = '0 0 0 0 0 0 0 0'
+        problem = True
 
     slowjet_output = '{: 3d}'.format(Njets)
     if Njets > 0:
@@ -387,9 +411,17 @@ for i in range(trento_seed, trento_seed + nevt):
                             + ' {: 5.3f}'.format(slowJet.phi(1))
         else:
             slowjet_output += ' 0 0 0'
+            problem = True
     else:
         slowjet_output += ' 0 0 0 0 0 0'
+        problem = True
 
     output = '{} {} {}\n'.format(stats_output, pythia_output,
                                  slowjet_output)
-    f.write(output)
+    if filter_results and problem:
+        g.write(output)
+    else:
+        f.write(output)
+
+g.close()
+f.write()
