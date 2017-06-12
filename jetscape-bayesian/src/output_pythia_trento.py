@@ -270,6 +270,10 @@ while i < trento_seed + nevt:
                 pythia_mult += 1
 
         # TODO introduce checks on hard-scattered particle assignments
+        # First check 0<jet.id()<100
+        for jet in (purejet,quenchedjet):
+            if (jet.id()<1 or jet.id()>99):
+                problem = True
 
         # Rescale quenchedjet daughters by momentum, not same as energy
         daughters = []
@@ -424,6 +428,7 @@ while i < trento_seed + nevt:
     else:
         f.write(output)
         i += 1
-
-g.close()
+        
 f.close()
+if args.filter:
+    g.close()
