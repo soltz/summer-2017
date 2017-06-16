@@ -46,3 +46,7 @@ daily_report/
 pythia/
 data/
 fudge-4.2.1/
+
+# Package Build/Install Directories #
+#####################################
+*.egg-info/
