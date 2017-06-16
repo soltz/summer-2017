@@ -12,6 +12,7 @@ from shutil import rmtree
 import tarfile
 import yaml
 import json
+import re
 
 
 __all__ = ['HEPData_Manager']
@@ -21,9 +22,8 @@ class HEPData_Manager(object):
 
     def __init__(self, data_dir='~/.hepdata'):
         self.data_dir = _create_dir(data_dir)
-        # self.data_dir = data_dir
         self.json_url = 'https://hepdata.net/record/{}?format=json'
-        self.zip_url = 'https://www.hepdata.net/download/submission/{}/1/{}'
+        self.targz_url = 'https://www.hepdata.net/download/submission/{}/{}/{}'
 
     def has_data(self, inspire_id):
         return os.path.exists('{}/{}/digest.json'.format(self.data_dir,
@@ -46,21 +46,38 @@ class HEPData_Manager(object):
         data_dir = '{}/{}'.format(self.data_dir, inspire_id)
         _create_dir(data_dir)
         digest_url = self.json_url.format(inspire_id)
-        digest_file = '{}/{}/digest.json'.format(self.data_dir, inspire_id)
+        digest_file = '{}/digest.json'.format(data_dir)
         with urlopen(digest_url) as response, open(digest_file, 'wb') as out:
             copyfileobj(response, out)
-        targz_url = self.zip_url.format(inspire_id, data_format)
-        targz_file = '{}/{}/submission.tar.gz'.format(self.data_dir,
-                                                      inspire_id)
+        with open(digest_file) as in_file:
+            data = json.load(in_file)
+        targz_url = data['record']['access_urls']['links'][data_format]
+        version = int(targz_url.split('/')[-2])
+        targz_file = '{}/submission.tar.gz'.format(data_dir)
         with urlopen(targz_url) as response, open(targz_file, 'wb') as out:
             copyfileobj(response, out)
         tar = tarfile.open(targz_file, "r:gz")
         for x in tar.getmembers()[1:]:
             name = x.name.split('/', 1)[1]
-            x_path = '{}/{}/{}'.format(self.data_dir, inspire_id, name)
+            x_path = '{}/{}'.format(data_dir, name)
             with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
                 copyfileobj(tarf, out)
         tar.close()
+        for i in range(version):
+            i += 1
+            version_dir = '{}/v{}'.format(data_dir, i)
+            _create_dir(version_dir)
+            targz_url = self.targz_url.format(inspire_id, i, data_format)
+            targz_file = '{}/submission.tar.gz'.format(version_dir)
+            with urlopen(targz_url) as response, open(targz_file, 'wb') as out:
+                copyfileobj(response, out)
+            tar = tarfile.open(targz_file, "r:gz")
+            for x in tar.getmembers()[1:]:
+                name = x.name.split('/', 1)[1]
+                x_path = '{}/{}'.format(version_dir, name)
+                with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
+                    copyfileobj(tarf, out)
+            tar.close()
 
     def remove_data(self, inspire_id):
         # Checks:
@@ -77,12 +94,19 @@ class HEPData_Manager(object):
         data_tables = data['data_tables']
         return [x['processed_name'] for x in data_tables]
 
-    def load_table(self, inspire_id, table_name, data_format='yaml'):
+    def load_table(self, inspire_id, table_name, version=None,
+                   data_format='yaml'):
         # Checks:
         #  - data is actually stored
         #  - Table name is valid
-        table_file = '{}/{}/{}.{}'.format(self.data_dir, inspire_id,
-                                          table_name, data_format)
+        #  - version is valid integer
+        if version:
+            table_file = '{}/{}/v{}/{}.{}'.format(self.data_dir, inspire_id,
+                                                  version, table_name,
+                                                  data_format)
+        else:
+            table_file = '{}/{}/{}.{}'.format(self.data_dir, inspire_id,
+                                              table_name, data_format)
         with open(table_file) as in_file:
             data = yaml.load(in_file)
         return data
