@@ -72,8 +72,10 @@ class HEPData_Manager(object):
         for x in tar.getmembers()[1:]:
             name = x.name.split('/', 1)[1]
             x_path = '{}/{}'.format(data_dir, name)
-            with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
+            tarf = tar.extractfile(x)
+            with open(x_path, 'wb') as out:
                 copyfileobj(tarf, out)
+            tarf.close()
         tar.close()
         # Go through all versions and save those in respective directories
         for i in range(version):
@@ -90,8 +92,10 @@ class HEPData_Manager(object):
             for x in tar.getmembers()[1:]:
                 name = x.name.split('/', 1)[1]
                 x_path = '{}/{}'.format(version_dir, name)
-                with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
+                tarf = tar.extractfile(x)
+                with open(x_path, 'wb') as out:
                     copyfileobj(tarf, out)
+                tarf.close()
             tar.close()
 
     def remove_data(self, inspire_id):
