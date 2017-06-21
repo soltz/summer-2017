@@ -133,7 +133,7 @@ else:
     output_path = args.output
 if args.filter_file == 'auto':
     filter_path = os.path.join(path, '{}_{}_filtered.txt'.format(args.quench,
-                                                            args.nevt))
+                                                                 args.nevt))
 else:
     filter_path = args.filter_file
 
@@ -469,6 +469,7 @@ while i < nevt:
                                  slowjet_output)
     if filter_results and problem:
         g.write(output)
+        pythia.event.list()
     else:
         f.write(output)
         i += 1
