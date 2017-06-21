@@ -26,6 +26,28 @@ def _create_dir(path):
     return str(os.path.abspath(path))
 
 
+def _save_event(event, filename):
+    with open(filename, 'w') as f:
+        f.write('--------  PYTHIA Event Listing  (complete event)  ---------------------------------------------------------------------------------\n\n')
+        f.write('    no        id   name            status     mothers   daughters     colours      p_x        p_y        p_z         e          m  \n')
+        for i in range(event.size()):
+            no = i
+            id = event[i].id()
+            name = event[i].name()
+            status = event[i].status()
+            mothers = (event[i].mother1(), event[i].mother2())
+            daughters = (event[i].daughter1(), event[i].daughter2())
+            colors = (event[i].col(), event[i].acol())
+            px = event[i].px()
+            py = event[i].py()
+            pz = event[i].pz()
+            e = event[i].e()
+            m = event[i].m()
+            f.write('{:>6}{:>10}   {:<12}{:>10}{:>6}{:>6}{:>6}{:>6}{:>6}{:>6}{:>11.3f}{:>11.3f}{:>11.3f}{:>10.3f}{:>11.3f}\n'.format(no, id, name, status, mothers[0], mothers[1], daughters[0], daughters[1], colors[0], colors[1], px, py, pz, e, m))
+        f.write('--------  End PYTHIA Event Listing  -----------------------------------------------------------------------------------------------\n')
+    print('Filtered event saved to {}'.format(filename))
+
+
 # -------------------------- ARGUMENT PARSING ------------------------ #
 
 prog_description = '''
@@ -117,13 +139,15 @@ if args.filter and args.filter_file == args.file:
 if not args.filter and args.filter_file != 'auto':
     print('Warning: Filter flag is not set so filter file will not be created')
 
-if args.output == 'auto' or (args.filter and args.filter_file == 'auto'):
+if args.output == 'auto' or args.filter:
     # Set up data directory
     cwd = os.getcwd()
     path = os.path.join(cwd, 'data')
     date_time = strftime("%Y.%m.%d_%H.%M.%S", gmtime())
     path = os.path.join(path, date_time)
     _create_dir(path)
+    filtered_events_path = os.path.join(path, 'filtered_events')
+    _create_dir(filtered_events_path)
 
 # Generate appropriate output and filter file paths
 if args.output == 'auto':
@@ -258,6 +282,7 @@ if filter_results:
 
 # Loop over events, start with PYTHIA then add TRENTO to PYTHIA event
 i = 0
+problem_count = 0
 while i < nevt:
     mult = int(mult_scale * trento_data[i][3])
     b = trento_data[i][1]
@@ -469,10 +494,14 @@ while i < nevt:
                                  slowjet_output)
     if filter_results and problem:
         g.write(output)
-        pythia.event.list()
+        filename = '{}_{}_event.txt'.format(i, problem_count)
+        filename = os.path.join(filtered_events_path, filename)
+        _save_event(pythia.event, filename)
+        problem_count += 1
     else:
         f.write(output)
         i += 1
+        problem_count = 0
 
 f.close()
 if args.filter:
