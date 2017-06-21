@@ -307,9 +307,9 @@ while i < nevt:
                 pythia_mult += 1
 
         # TODO introduce checks on hard-scattered particle assignments
-        # First check 0<jet.id()<100
+        # First check 0 < abs(jet.id()) < 100
         for jet in (purejet, quenchedjet):
-            if jet.id() < 1 or jet.id() > 99:
+            if abs(jet.id()) < 1 or abs(jet.id()) > 99:
                 problem = True
                 print('Problem with jet id found: {}'.format(jet.id()))
 
