@@ -445,6 +445,7 @@ while i < nevt:
     else:
         pythia_output = '0 0 0 0 0 0 0 0'
         problem = True
+        print('Pythia is not on for some reason')
 
     slowjet_output = '{: 3d}'.format(Njets)
     if Njets > 0:
@@ -458,9 +459,11 @@ while i < nevt:
         else:
             slowjet_output += ' 0 0 0'
             problem = True
+            print('Second jet not found')
     else:
         slowjet_output += ' 0 0 0 0 0 0'
         problem = True
+        print('No jets found')
 
     output = '{} {} {}\n'.format(stats_output, pythia_output,
                                  slowjet_output)
