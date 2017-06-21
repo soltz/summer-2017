@@ -8,6 +8,7 @@ import random
 import pythia8
 import numpy as np
 import argparse
+import subprocess
 
 
 # -------------------------- ARGUMENT PARSING ------------------------ #
@@ -227,6 +228,14 @@ f.write(header)
 if filter_results:
     g.write(header)
 
+proc = subprocess.Popen('trento Au Au'.split(), stdout=subprocess.PIPE)
+trento_data = np.array([l.split() for l in proc.stdout][0], dtype=float)
+mult = int(trento_data[3])
+b = trento_data[1]
+Npart = int(trento_data[2])
+e2 = trento_data[4]
+
+
 # Loop over events, start with PYTHIA then add TRENTO to PYTHIA event
 i = trento_seed
 while i < trento_seed + nevt:
@@ -302,7 +311,7 @@ while i < trento_seed + nevt:
     # put together by last year's summer student.
     # It will need to be re-written at some point.
     if trento_on:
-        for j in range(int(mult[i])):
+        for j in range(mult):
 
             p_sample = 1
             while p_sample > 0.99:
@@ -391,12 +400,12 @@ while i < trento_seed + nevt:
     # Prepare output, stats include TRENTO information
     # (values set to zero if not turned on)
     stats_output = '{: 5d}'.format(i) \
-                 + '{: 6d}'.format(int(mult[i]) + pythia_mult) \
+                 + '{: 6d}'.format(mult + pythia_mult) \
                  + '{: 5.3f}'.format(xgj) \
                  + '{: 4.2f}'.format(quench) \
-                 + '{: 6.2f}'.format(b[i]) \
-                 + '{: 4d}'.format(int(Npart[i])) \
-                 + '{: 5.3f}'.format(e2[i])
+                 + '{: 6.2f}'.format(b) \
+                 + '{: 4d}'.format(Npart) \
+                 + '{: 5.3f}'.format(e2)
 
     if pythia_on:
         gamma_output = '{: 3d}'.format(purejet.id()) \
@@ -435,6 +444,12 @@ while i < trento_seed + nevt:
     else:
         f.write(output)
         i += 1
+        proc = subprocess.Popen('trento Au Au'.split(), stdout=subprocess.PIPE)
+        trento_data = np.array([l.split() for l in proc.stdout][0], dtype=float)
+        mult = int(trento_data[3])
+        b = trento_data[1]
+        Npart = int(trento_data[2])
+        e2 = trento_data[4]
 
 f.close()
 if args.filter:
