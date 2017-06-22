@@ -76,6 +76,8 @@ parser.add_argument('-c', '--QCDoff', action='store_true',
                     help='turn PYTHIA hard QCD processes off')
 parser.add_argument('-q', '--QEDoff', action='store_true',
                     help='turn PYTHIA hard QED processes off')
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help='save filtered events and output messages')
 parser.add_argument('-o', '--output', type=str, metavar='OUTPUT_FILE',
                     default='auto',
                     help='path to output file')
@@ -344,7 +346,8 @@ while i < nevt:
         for jet in (purejet, quenchedjet):
             if abs(jet.id()) < 1 or abs(jet.id()) > 99:
                 problem = True
-                print('Problem with jet id found: {}'.format(jet.id()))
+                if args.verbose:
+                    print('Problem with jet id found: {}'.format(jet.id()))
 
         # Rescale quenchedjet daughters by momentum, not same as energy
         daughters = []
@@ -468,7 +471,8 @@ while i < nevt:
             purejet_index = 1
             xgj = slowJet.pT(0)/slowJet.pT(1)
         else:
-            print('Neither jet was identified as pure')
+            if args.verbose:
+                print('Neither jet was identified as pure')
             xgj = 0
             problem = True
 
@@ -495,7 +499,8 @@ while i < nevt:
     else:
         pythia_output = '0 0 0 0 0 0 0 0'
         problem = True
-        print('Pythia is not on for some reason')
+        if args.verbose:
+            print('Pythia is not on for some reason')
 
     slowjet_output = '{: 3d}'.format(Njets)
     if Njets > 0:
@@ -509,19 +514,22 @@ while i < nevt:
         else:
             slowjet_output += ' 0 0 0'
             problem = True
-            print('Second jet not found')
+            if args.verbose:
+                print('Second jet not found')
     else:
         slowjet_output += ' 0 0 0 0 0 0'
         problem = True
-        print('No jets found')
+        if args.verbose:
+            print('No jets found')
 
     output = '{} {} {}\n'.format(stats_output, pythia_output,
                                  slowjet_output)
     if filter_results and problem:
         g.write(output)
-        filename = '{}_{}_event.txt'.format(i, problem_count)
-        filename = os.path.join(filtered_events_path, filename)
-        _save_event(pythia.event, filename)
+        if args.verbose:
+            filename = '{}_{}_event.txt'.format(i, problem_count)
+            filename = os.path.join(filtered_events_path, filename)
+            _save_event(pythia.event, filename)
         problem_count += 1
     else:
         f.write(output)
