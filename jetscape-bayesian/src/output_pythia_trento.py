@@ -64,7 +64,7 @@ parser = argparse.ArgumentParser(
 
 # Add arguments
 parser.add_argument('-f', '--file', type=str, metavar='TRENTO_FILE',
-                    default='off',
+                    default='generate',
                     help='path to TRENTO data file or turn \"off\"')
 parser.add_argument('-e', '--eCM', type=float, default=200.0,
                     metavar='BEAM_ENERGY',
@@ -102,7 +102,7 @@ parser.add_argument('-x', '--filter-file', type=str,
 args = parser.parse_args()
 
 # Check validity of arguments
-if args.file != 'off':
+if args.file != 'off' and args.file != 'generate':
     if not os.path.isfile(args.file):
         raise ValueError('TRENTO file {} not found.'.format(args.file))
 
@@ -203,10 +203,12 @@ if args.QCDoff and args.QEDoff:
 # ------------------------- DATA LOADING ----------------------------- #
 
 # Load/generate TRENTO data for 100,000 Au Au events
-if trento_file == 'off':
+if trento_file == 'generate':
     proc = subprocess.Popen('trento Au Au {}'.format(nevt).split(),
                             stdout=subprocess.PIPE)
     trento_data = np.array([l.split() for l in proc.stdout], dtype=float)
+elif trento_file == 'off':
+    trento_on = False
 else:
     try:
         trento_data = np.loadtxt(trento_file)
@@ -284,10 +286,16 @@ if filter_results:
 i = 0
 problem_count = 0
 while i < nevt:
-    mult = int(mult_scale * trento_data[i][3])
-    b = trento_data[i][1]
-    Npart = int(trento_data[i][2])
-    e2 = trento_data[i][4]
+    if trento_on:
+        mult = int(mult_scale * trento_data[i][3])
+        b = trento_data[i][1]
+        Npart = int(trento_data[i][2])
+        e2 = trento_data[i][4]
+    else:
+        mult = 0
+        b = 0
+        Npart = 0
+        e2 = 0
     problem = False
 
     # Reset event data ???
