@@ -79,7 +79,7 @@ parser.add_argument('-q', '--QEDoff', action='store_true',
 parser.add_argument('-o', '--output', type=str, metavar='OUTPUT_FILE',
                     default='auto',
                     help='path to output file')
-parser.add_argument('-s', '--seed', type=int, default=-1,
+parser.add_argument('-s', '--seed', type=int, default=0,
                     help='seed for random numbers in PYTHIA')
 parser.add_argument('-p', '--SJpTmin', type=int, default=10,
                     help='slowjet minimum pT')
@@ -458,11 +458,9 @@ while i < nevt:
         # print('Jet 0')
         # for i in slowJet.constituents(0):
         #     print(i)
-        #     # print('no: {} id: {} status: {}'.format(0, i.id(), i.status()))
         # print('Jet 1')
         # for i in slowJet.constituents(1):
         #     print(i)
-        # #     print('no: {} id: {} status: {}'.format(0, i.id(), i.status()))
         if slowJet.constituents(0)[0] in purejet.daughterListRecursive():
             purejet_index = 0
             xgj = slowJet.pT(1)/slowJet.pT(0)
