@@ -451,9 +451,28 @@ while i < nevt:
     slowJet.analyze(pythia.event)
     Njets = slowJet.sizeJet()
     if (Njets == 1):
-        xgj = 0.
+        xgj = 0
     else:
-        xgj = slowJet.pT(1)/slowJet.pT(0)
+        # xgj = slowJet.pT(1)/slowJet.pT(0)
+        # pythia.event.list()
+        # print('Jet 0')
+        # for i in slowJet.constituents(0):
+        #     print(i)
+        #     # print('no: {} id: {} status: {}'.format(0, i.id(), i.status()))
+        # print('Jet 1')
+        # for i in slowJet.constituents(1):
+        #     print(i)
+        # #     print('no: {} id: {} status: {}'.format(0, i.id(), i.status()))
+        if slowJet.constituents(0)[0] in purejet.daughterListRecursive():
+            purejet_index = 0
+            xgj = slowJet.pT(1)/slowJet.pT(0)
+        elif slowJet.constituents(1)[0] in purejet.daughterListRecursive():
+            purejet_index = 1
+            xgj = slowJet.pT(0)/slowJet.pT(1)
+        else:
+            print('Neither jet was identified as pure')
+            xgj = 0
+            problem = True
 
     # Prepare output, stats include TRENTO information
     # (values set to zero if not turned on)
