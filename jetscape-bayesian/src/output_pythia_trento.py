@@ -453,7 +453,7 @@ while i < nevt:
     slowJet = pythia8.SlowJet(-1, SJradius, SJpTmin, etaMax, nSel, massSet)
     slowJet.analyze(pythia.event)
     Njets = slowJet.sizeJet()
-    if (Njets == 1):
+    if Njets == 1 or Njets == 0:
         xgj = 0
     else:
         # xgj = slowJet.pT(1)/slowJet.pT(0)
