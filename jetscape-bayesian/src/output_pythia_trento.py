@@ -83,7 +83,7 @@ parser.add_argument('-o', '--output', type=str, metavar='OUTPUT_FILE',
                     help='path to output file')
 parser.add_argument('-s', '--seed', type=int, default=0,
                     help='seed for random numbers in PYTHIA')
-parser.add_argument('-p', '--SJpTmin', type=int, default=10,
+parser.add_argument('-p', '--SJpTmin', type=float, default=10.0,
                     help='slowjet minimum pT')
 parser.add_argument('-r', '--SJradius', type=float, default=0.5,
                     help='slowjet radius')
@@ -157,7 +157,7 @@ if args.output == 'auto':
                                                         args.nevt))
 else:
     output_path = args.output
-if args.filter_file == 'auto':
+if args.filter_file == 'auto' and args.filter:
     filter_path = os.path.join(path, '{}_{}_filtered.txt'.format(args.quench,
                                                                  args.nevt))
 else:
