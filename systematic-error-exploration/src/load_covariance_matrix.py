@@ -1,7 +1,15 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import os
+import errno
 from fudge.gnd.covariances import base
+from fudge.gnd import styles
+from fudge.gnd import physicalQuantity
+from fudge.gnd.covariances import covarianceSuite
+from fudge.gnd.covariances import section
+from fudge.gnd.covariances import mixed
+from xData import gridded
 from xData import array
 from xData import gridded
 from xData import axes as axesModule
@@ -32,6 +40,44 @@ def get_GND_covariance(arr, energyBounds, name='default'):
                                        matrix=GNDgridded)
     return covariance
 
+def generate_full_covariance(covariances):
+    CS = covarianceSuite.covarianceSuite(projectile="Au197", target="Au197", evaluation="RHIC data v0.1")
+    # 'evaluation' on previous line is like a version number for the covarianceSuite
+
+    CS.styles.add(
+        styles.evaluated(
+            label="eval", derivedFrom="",
+            temperature=physicalQuantity.temperature(1e9, 'K'),
+            library="ALICE HEP data", version="0.1"))
+
+    mixedData = mixed.mixedForm(label="eval")
+
+    # assuming you have two covarianceMatrix instances that you want to combine:
+    for i in covariances:
+        mixedData.addComponent(i)
+    # mixedData.addComponent( covariance2 )
+
+    rowData = section.rowData( path="/xpath/to/data" )
+    columnData = section.columnData( path="/xpath/to/other/data" )  # only necessary if not equal to rowData
+    thisSection = section.section(label="Pb-Pb", rowData=rowData, columnData=columnData)
+    thisSection.add(mixedData)
+
+    CS.addSection(thisSection)
+
+    return CS
+
+def _create_dir(path):
+    if path[0] == '~':
+        path = path[2:]
+        home = os.path.expanduser('~')
+        path = os.path.join(home, path)
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+    return str(os.path.abspath(path))
+
 alice_event = 'ins1394678'
 data_manager = HEPData_Manager()
 if not data_manager.has_data(alice_event):
@@ -60,5 +106,10 @@ corr_cov_mat = np.array([[0.75 * x * y for x in corr_err] for y in corr_err])
 
 stat_cov = get_GND_covariance(stat_cov_mat, indep, 'statistical')
 corr_cov = get_GND_covariance(corr_cov_mat, indep, 'correlated')
-print('\n'.join(stat_cov.toXMLList()))
-print('\n'.join(corr_cov.toXMLList()))
+# print('\n'.join(stat_cov.toXMLList()))
+# print('\n'.join(corr_cov.toXMLList()))
+
+CS = generate_full_covariance([stat_cov, corr_cov])
+_create_dir('./data')
+CS.saveToFile("./data/covarianceExample.xml")
+
