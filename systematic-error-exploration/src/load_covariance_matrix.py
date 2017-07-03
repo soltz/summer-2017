@@ -81,7 +81,7 @@ def _create_dir(path):
 alice_event = 'ins1394678'
 data_manager = HEPData_Manager()
 if not data_manager.has_data(alice_event):
-    data_manager.get_data(alice_event) # INVESTIGATE WHY THIS FAILS IN PYTHON2
+    data_manager.get_data(alice_event)
     print('Downloaded and saved {} data!'.format(alice_event))
 
 table1_data = data_manager.load_table(alice_event, 'Table1')
