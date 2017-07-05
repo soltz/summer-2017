@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<covarianceSuite projectile="Au197" target="Au197" evaluation="RHIC data v0.1" version="GND 1.8" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <styles>
+    <evaluated label="eval" date="2017-06-27" library="ALICE HEP data" version="0.1">
+      <temperature value="1000000000.0" unit="K"/></evaluated></styles>
+  <section label="Pb-Pb" crossTerm="true">
+    <rowData xlink:href="/xpath/to/data"/>
+    <columnData xlink:href="/xpath/to/other/data"/>
+    <mixed label="eval">
+      <covarianceMatrix label="statistical" type="absolute">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="GeV/c" style="boundaries">
+              <values length="7">35 45 55 65 75 85 95</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="GeV/c" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit=""/></axes>
+          <array shape="7,7" symmetry="lower">
+            <values length="28">6.70761e-5 0 1.21e-4 0 0 2.1904e-4 0 0 0 4.1209e-4 0 0 0 0 7.29e-4 0 0 0 0 0 1.19025e-3 0 0 0 0 0 0 1.77241e-3</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="correlated" type="absolute">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="GeV/c" style="boundaries">
+              <values length="7">35 45 55 65 75 85 95</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="GeV/c" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit=""/></axes>
+          <array shape="7,7" symmetry="lower">
+            <values length="28">7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5 7.5e-5</values></array></gridded2d></covarianceMatrix></mixed></section>
+</covarianceSuite>
