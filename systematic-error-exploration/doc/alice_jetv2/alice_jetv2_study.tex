@@ -1,0 +1,70 @@
+\documentclass[11pt]{article}
+%\markright{Official Use Only}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{verbatim}
+
+\textwidth 7.0in
+\textheight 9in
+%\itemsep 0pt
+%\parsep 3pt
+%\parindent 5pt
+\parskip 3pt
+\hoffset -1.in
+\voffset -0.5in
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Systematic Error Study}
+\rhead{July 2017}
+
+%\usepackage{pdfsync}
+\begin{document}
+% Figure commands (not needed here)
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\floatpagefraction}{0.1}
+
+\begin{center}
+{\Large \bf Systematic Error Study for ALICE charged-jet $v_2$ Measurement}\\
+\bigskip
+LLNL-TR-xxxxxx
+\footnote{This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344.}
+\\
+\bigskip
+Matthias Heinz and Ron Soltz
+\end{center}
+
+\begin{abstract}
+We study the treatment of systematic errors in the determination of $v_2$ for charged jets in $\sqrt{s_{NN}}=2.76$~TeV Pb-Pb collisions by the ALICE Collaboration~\cite{Adam:2016ix}.  Working with the reported values and errors for the 0-5\% centrality data we evaluate the $\chi^2$ according to the formulas given for the statistical and systematic errors, where the latter are separated into correlated and shape contributions.  We reproduce both the $\chi^2$ and $p$-values relative to a null (zero) result.  We then re-cast the systematic errors into an equivalent co-variance matrix and obtain identical results, demonstrating that the two methods are equivalent. 
+\end{abstract}
+
+\section{Motivation}
+
+This work is motivated by the need to select a data format that can accommodate a full range of systematic errors.  To date, most high energy physics experiments publish results with estimates for both statistical and systematic errors of each bin, under the assumption that these errors are fully correlated across all bins.  Some experiments are beginning to publish systematic errors as co-variance matrices, which are more general.  In theory the former can be recast into the latter, more general format.  Using the recently published charged-jet $v_2$ measurements from ALICE we show that evaluation $\chi^2$ using both methods yields consistent results.
+
+\section{$\chi^2$ Minimization Method}
+
+{\it Include figure of data, equation (10) from paper, discuss minimization procedure, and show results.}
+
+\section{Co-Variance Method}
+
+{\it Re-cast equation (10) into general form, map to covariant form, and show results.}
+
+\bibliographystyle{plain}
+\begin{thebibliography}{10}
+
+\bibitem{Adam:2016ix} J. Adam {\it et al.} [ALICE Collaboration], Azimuthal anisotropy of charged jet production in $\sqrt{s_{NN}}$=2.76~TeV Pb-Pb collisions, {\it J. Phys. Lett. B}, 753, 511 (2016).
+
+\bibitem{Demortier:1999aa} L. Demortier, Equivalence of the best-fit and covariance-matrix methods for comparing binned data with a model in the presence of correlated systematic uncertainties, CDF-MEMO-8661 (1999).
+
+\bibitem{Gao:2014cp} J. Gao, {\it et al.}, CT10 next-to-next-to-leading order global analysis of QCD, {\it Phys. Rev. D} 89, 03309 (2014).
+
+\end{thebibliography}
+
+\end{document}
