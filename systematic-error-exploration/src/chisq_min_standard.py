@@ -64,7 +64,7 @@ def redmer_chi_sq(a, b):
     chisq = 0
 
     for i in range(len(indep)):
-        chisq += (dep[i] + np.sqrt(0.75) * a * corr_err[i] + b)**2 / stat_err[i]**2
+        chisq += (dep[i] + a * corr_err[i] + b)**2 / stat_err[i]**2
 
     chisq += a**2
 
@@ -75,6 +75,24 @@ def redmer_chi_sq(a, b):
     subsum = subsum / len(indep)
 
     chisq += subsum
+
+    return chisq
+
+global sigma_new
+sigma_new = 0
+for i in range(len(acorr_err)):
+    sigma_new += 1 / acorr_err[i]**2
+sigma_new = sigma_new / len(acorr_err)
+sigma_new = np.sqrt(1 / sigma_new)
+
+def redmer_chi_sq_alt(a, b):
+    chisq = 0
+
+    for i in range(len(indep)):
+        chisq += (dep[i] + a * corr_err[i] + b * sigma_new)**2 / stat_err[i]**2
+
+    chisq += a**2
+    chisq += b**2
 
     return chisq
 
