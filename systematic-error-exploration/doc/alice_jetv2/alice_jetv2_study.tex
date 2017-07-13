@@ -50,11 +50,69 @@ This work is motivated by the need to select a data format that can accommodate 
 
 \section{$\chi^2$ Minimization Method}
 
-{\it Include figure of data, equation (10) from paper, discuss minimization procedure, and show results.}
+\begin{center}
+    \begin{figure}
+        \includegraphics[width=.7\textwidth]{figures/data}
+        % \caption{Second-order harmonic coefficient \vj~as function a of \ptjet{} for 0--5\% collision centrality. The error bars on the points represent statistical uncertainties, the open and shaded boxes indicate the shape and correlated uncertainties (as explained in Sec.~\ref{sec:24}). }
+        \label{fig:data}
+    \end{figure}
+\end{center}
+
+The significance test calculation done by the ALICE collaboration used the following equation:
+\begin{equation}\label{eq:chisq_org}
+    \tilde{\chi}^2 (\epsilon_{\rm corr}, \epsilon_{\rm shape}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{\rm corr} \sigma_{\rm corr, i} + \epsilon_{\rm shape} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{\rm corr}^2 +  \frac{1}{n}\sum_{i=1}^{n} \frac{\epsilon_{\rm shape}^2}{\sigma^2_{\rm shape, i}}   \right]
+\end{equation}
+$\mu_i$ is the hypothesis against which we are testing the data, which is 0 in our case. $\sigma_{\rm corr, i}$ and $\sigma_{\rm shape, i}$ are the correlated and shape uncertainties on the $i$-th bin, and $\sigma_i$ is the uncorrelated uncertainty on the $i$-th bin. $\epsilon_{\rm corr}$ and $\epsilon_{\rm shape}$ are free parameters with respect to which the $\tilde{\chi}^2$ is minimized. This minimization was done using the \texttt{iminuit} package in Python. Using the minimized $\tilde{\chi}^2$, the $p$-value was obtained by using the \texttt{chisqprob} method with $n - 2$ degrees of freedom from the Python scipy statistics library. Using this approach, we were able to verify the results published by the ALICE collaboration.
+
+\begin{center}
+\begin{tabular}{ l r r }
+  & \multicolumn{2}{c}{$p$-value} \\
+$p_T$ range & ALICE & LLNL \\
+\hline
+30-100 GeV & 0.12 & 0.12 \\ 
+30-60 GeV & 0.07 & 0.07 \\ 
+60-100 GeV & 0.02 & 0.02 \\
+% \hline
+\end{tabular}
+\end{center}
 
 \section{Co-Variance Method}
 
-{\it Re-cast equation (10) into general form, map to covariant form, and show results.}
+It can be shown that (\ref{eq:chisq_org}) can be re-expessed in the form:
+\begin{equation}\label{chisq_eff}
+    \tilde{\chi}^2 (\epsilon_{\rm corr}, \epsilon_{\rm new}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{\rm corr} \sigma_{\rm corr, i} + \epsilon_{\rm new} \sigma_{\rm new} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{\rm corr}^2 + \epsilon_{\rm new}^2 \right]
+\end{equation}
+\begin{equation}\label{sigma_new}
+    \sigma_{\rm new} = \frac{1}{n}\sum_{i=1}^{n} \frac{1}{\sigma^2_{\rm shape, i}}
+\end{equation}
+\begin{equation}\label{eps_new}
+    \epsilon_{\rm new} = \frac{\epsilon_{\rm shape}}{\sigma_{\rm new}}
+\end{equation}
+$\sigma_{\rm new}$ is effectively a uniform, fully-correlated error, indepedent from $\sigma_{\rm corr, i}$. With the $\chi^2$ expressed in this form, we are able to map this to an equivalent covariance matrix formulation of the minimization {\it need reference}. With the covariance matrix:
+\begin{equation}\label{covariance_matrix}
+    C_{ij} = \sigma_i^2 \delta_{ij} + \sigma_{\rm corr, i} \sigma_{\rm corr, j} + \sigma_{\rm new} \sigma_{\rm new}
+\end{equation}
+the minimized $\chi^2$ can be calculated by:
+\begin{equation}\label{cov_mat_chi2_min}
+    \chi_{min}^2 = \Delta^T C^{-1} \Delta
+\end{equation}
+where $\Delta$ is a length-$n$ vector with:
+\begin{equation}\label{delta_def}
+    \Delta_i = v_{2, i} - \mu_i
+\end{equation}
+Again, the $p$-value is computed from the $\chi_{min}^2$ using a $\chi^2$ distribution with $n - 2$ degrees of freedom. The results are identical to those obtained by the ALICE collaboration. It is important to note that the $p$-values calculated by both methods are equal to roughly machine precision, verifying the exact equivalence of the two methods.
+
+\begin{center}
+\begin{tabular}{ l r r }
+  & \multicolumn{2}{c}{$p$-value} \\
+$p_T$ range & \texttt{iminuit}-minimized & Covariance matrix \\
+\hline
+30-100 GeV & 0.1247858497 & 0.1247858497 \\ 
+30-60 GeV & 0.0685915881 & 0.0685915881 \\ 
+60-100 GeV & 0.0211009165 & 0.0211009165 \\
+% \hline
+\end{tabular}
+\end{center}
 
 \bibliographystyle{plain}
 \begin{thebibliography}{10}
