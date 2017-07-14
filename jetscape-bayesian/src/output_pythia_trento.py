@@ -456,14 +456,6 @@ while i < nevt:
     if Njets == 1 or Njets == 0:
         xgj = 0
     else:
-        # xgj = slowJet.pT(1)/slowJet.pT(0)
-        # pythia.event.list()
-        # print('Jet 0')
-        # for i in slowJet.constituents(0):
-        #     print(i)
-        # print('Jet 1')
-        # for i in slowJet.constituents(1):
-        #     print(i)
         if slowJet.constituents(0)[0] in purejet.daughterListRecursive():
             purejet_index = 0
             xgj = slowJet.pT(1)/slowJet.pT(0)
