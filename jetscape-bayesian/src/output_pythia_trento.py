@@ -52,6 +52,26 @@ def _count_shared(a, b):
     return len(set(a).intersection(b))
 
 
+def _list_event(event):
+    print('--------  PYTHIA Event Listing  (complete event)  ---------------------------------------------------------------------------------\n')
+    print('    no        id   name            status     mothers   daughters     colours      p_x        p_y        p_z         e          m  ')
+    for i in range(event.size()):
+        no = i
+        id = event[i].id()
+        name = event[i].name()
+        status = event[i].status()
+        mothers = (event[i].mother1(), event[i].mother2())
+        daughters = (event[i].daughter1(), event[i].daughter2())
+        colors = (event[i].col(), event[i].acol())
+        px = event[i].px()
+        py = event[i].py()
+        pz = event[i].pz()
+        e = event[i].e()
+        m = event[i].m()
+        print('{:>6}{:>10}   {:<12}{:>10}{:>6}{:>6}{:>6}{:>6}{:>6}{:>6}{:>11.3f}{:>11.3f}{:>11.3f}{:>10.3f}{:>11.3f}'.format(no, id, name, status, mothers[0], mothers[1], daughters[0], daughters[1], colors[0], colors[1], px, py, pz, e, m))
+    print('--------  End PYTHIA Event Listing  -----------------------------------------------------------------------------------------------')
+
+
 # -------------------------- ARGUMENT PARSING ------------------------ #
 
 prog_description = '''
