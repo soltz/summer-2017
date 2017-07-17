@@ -255,11 +255,18 @@ pythia.readString('Print:quiet = on')
 # Set eCM
 pythia.readString('Beams:eCM = {}'.format(eCM))
 
-# Set QCD
-pythia.readString('HardQCD:all = {}'.format(QCD))
+# If looking for specific photon processes, enable them
+if args.QCDoff and not args.QEDoff:
+    pythia.readString("PromptPhoton:qg2qgamma = on")
+    pythia.readString("PromptPhoton:qqbar2ggamma = on")
+    # Disable Photon -> lepton anti-lepton pair processes
+    pythia.readString("TimeShower:QEDshowerByGamma = off")
+else:
+    # Set QCD
+    pythia.readString('HardQCD:all = {}'.format(QCD))
 
-# Set QED
-pythia.readString('PromptPhoton:all = {}'.format(QED))
+    # Set QED
+    pythia.readString('PromptPhoton:all = {}'.format(QED))
 
 # Set minimum transverse momentum (?)
 pythia.readString('PhaseSpace:pTHatMin = {}'.format(pTHatMin))
