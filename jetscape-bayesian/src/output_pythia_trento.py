@@ -465,20 +465,44 @@ while i < nevt:
     slowJet = pythia8.SlowJet(-1, SJradius, SJpTmin, etaMax, nSel, massSet)
     slowJet.analyze(pythia.event)
     Njets = slowJet.sizeJet()
+    # Compute xgj
     if Njets == 1 or Njets == 0:
         xgj = 0
     else:
-        if slowJet.constituents(0)[0] in purejet.daughterListRecursive():
+        if photon_initial_state:
+            # Project out final state photons
+            gamma_f = [(x, pythia.event[x].pT()) for x in purejet_list
+                       if pythia.event[x].id() == 22
+                       and pythia.event[x].isFinal()]
+            # Sort by pT to get hardest photon
+            gamma_f.sort(key=lambda x: x[1])
+            final_photon = gamma_f[0][0]
+            final_photon_pt = gamma_f[0][1]
+            # Identify which jet the final photon was grouped into
             purejet_index = 0
-            xgj = slowJet.pT(1)/slowJet.pT(0)
-        elif slowJet.constituents(1)[0] in purejet.daughterListRecursive():
-            purejet_index = 1
-            xgj = slowJet.pT(0)/slowJet.pT(1)
+            for x in range(Njets):
+                if final_photon in slowJet.constituents(x):
+                    purejet_index = x
+            # Compute appropriate xjg, assigning the highest-pT remaining jet
+            # as the quenched jet
+            if purejet_index == 0:
+                quenchedjet_index = 1
+            else:
+                quenchedjet_index = 0
+            xgj = slowJet.pT(quenchedjet_index) / final_photon_pt
         else:
-            if args.verbose:
-                print('Neither jet was identified as pure')
-            xgj = 0
-            problem = True
+            # Identify the pure jet as the jet that shares the most constituents
+            # with the purejet daughters
+            jet_counts = [_count_shared(purejet_list, slowJet.constituents(x))
+                          for x in range(Njets)]
+            purejet_index = jet_counts.index(max(jet_counts))
+            # Compute appropriate xjg, assigning the highest-pT remaining jet
+            # as the quenched jet
+            if purejet_index == 0:
+                quenchedjet_index = 1
+            else:
+                quenchedjet_index = 0
+            xgj = slowJet.pT(quenchedjet_index) / slowJet.pT(purejet_index)
 
     # Prepare output, stats include TRENTO information
     # (values set to zero if not turned on)
