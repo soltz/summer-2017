@@ -48,6 +48,10 @@ def _save_event(event, filename):
     print('Filtered event saved to {}'.format(filename))
 
 
+def _count_shared(a, b):
+    return len(set(a).intersection(b))
+
+
 # -------------------------- ARGUMENT PARSING ------------------------ #
 
 prog_description = '''
