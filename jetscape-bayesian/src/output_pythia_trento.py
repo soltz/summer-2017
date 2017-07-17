@@ -343,6 +343,9 @@ while i < nevt:
             else:
                 purejet = pythia.event[6]
                 quenchedjet = pythia.event[5]
+        # Get list of all ids in pureJet
+        purejet_list = list(purejet.daughterListRecursive())
+        purejet_list.append(purejet.id())
 
         # Get PYTHIA event multiplicity
         pythia_mult = 0
