@@ -48,6 +48,10 @@ def _save_event(event, filename):
     print('Filtered event saved to {}'.format(filename))
 
 
+def _count_shared(a, b):
+    return len(set(a).intersection(b))
+
+
 # -------------------------- ARGUMENT PARSING ------------------------ #
 
 prog_description = '''
@@ -255,11 +259,18 @@ pythia.readString('Print:quiet = on')
 # Set eCM
 pythia.readString('Beams:eCM = {}'.format(eCM))
 
-# Set QCD
-pythia.readString('HardQCD:all = {}'.format(QCD))
+# If looking for specific photon processes, enable them
+if args.QCDoff and not args.QEDoff:
+    pythia.readString("PromptPhoton:qg2qgamma = on")
+    pythia.readString("PromptPhoton:qqbar2ggamma = on")
+    # Disable Photon -> lepton anti-lepton pair processes
+    pythia.readString("TimeShower:QEDshowerByGamma = off")
+else:
+    # Set QCD
+    pythia.readString('HardQCD:all = {}'.format(QCD))
 
-# Set QED
-pythia.readString('PromptPhoton:all = {}'.format(QED))
+    # Set QED
+    pythia.readString('PromptPhoton:all = {}'.format(QED))
 
 # Set minimum transverse momentum (?)
 pythia.readString('PhaseSpace:pTHatMin = {}'.format(pTHatMin))
@@ -321,6 +332,7 @@ while i < nevt:
         # If there is a gamma jet, make that pure
         # Otherwise, pick one of the parton jets to be pure
         # Initial hard partons are stored in pythia.event [5] and [6]
+        photon_initial_state = True
         if pythia.event[5].id() == 22:
             purejet = pythia.event[5]
             quenchedjet = pythia.event[6]
@@ -328,12 +340,16 @@ while i < nevt:
             purejet = pythia.event[6]
             quenchedjet = pythia.event[5]
         else:
+            photon_initial_state = False
             if random.randint(1, 2) == 1:
                 purejet = pythia.event[5]
                 quenchedjet = pythia.event[6]
             else:
                 purejet = pythia.event[6]
                 quenchedjet = pythia.event[5]
+        # Get list of all ids in pureJet
+        purejet_list = list(purejet.daughterListRecursive())
+        purejet_list.append(purejet.id())
 
         # Get PYTHIA event multiplicity
         pythia_mult = 0
@@ -453,20 +469,44 @@ while i < nevt:
     slowJet = pythia8.SlowJet(-1, SJradius, SJpTmin, etaMax, nSel, massSet)
     slowJet.analyze(pythia.event)
     Njets = slowJet.sizeJet()
+    # Compute xgj
     if Njets == 1 or Njets == 0:
         xgj = 0
     else:
-        if slowJet.constituents(0)[0] in purejet.daughterListRecursive():
+        if photon_initial_state:
+            # Project out final state photons
+            gamma_f = [(x, pythia.event[x].pT()) for x in purejet_list
+                       if pythia.event[x].id() == 22
+                       and pythia.event[x].isFinal()]
+            # Sort by pT to get hardest photon
+            gamma_f.sort(key=lambda x: x[1])
+            final_photon = gamma_f[0][0]
+            final_photon_pt = gamma_f[0][1]
+            # Identify which jet the final photon was grouped into
             purejet_index = 0
-            xgj = slowJet.pT(1)/slowJet.pT(0)
-        elif slowJet.constituents(1)[0] in purejet.daughterListRecursive():
-            purejet_index = 1
-            xgj = slowJet.pT(0)/slowJet.pT(1)
+            for x in range(Njets):
+                if final_photon in slowJet.constituents(x):
+                    purejet_index = x
+            # Compute appropriate xjg, assigning the highest-pT remaining jet
+            # as the quenched jet
+            if purejet_index == 0:
+                quenchedjet_index = 1
+            else:
+                quenchedjet_index = 0
+            xgj = slowJet.pT(quenchedjet_index) / final_photon_pt
         else:
-            if args.verbose:
-                print('Neither jet was identified as pure')
-            xgj = 0
-            problem = True
+            # Identify the pure jet as the jet that shares the most constituents
+            # with the purejet daughters
+            jet_counts = [_count_shared(purejet_list, slowJet.constituents(x))
+                          for x in range(Njets)]
+            purejet_index = jet_counts.index(max(jet_counts))
+            # Compute appropriate xjg, assigning the highest-pT remaining jet
+            # as the quenched jet
+            if purejet_index == 0:
+                quenchedjet_index = 1
+            else:
+                quenchedjet_index = 0
+            xgj = slowJet.pT(quenchedjet_index) / slowJet.pT(purejet_index)
 
     # Prepare output, stats include TRENTO information
     # (values set to zero if not turned on)
