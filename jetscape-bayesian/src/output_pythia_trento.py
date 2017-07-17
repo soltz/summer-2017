@@ -328,6 +328,7 @@ while i < nevt:
         # If there is a gamma jet, make that pure
         # Otherwise, pick one of the parton jets to be pure
         # Initial hard partons are stored in pythia.event [5] and [6]
+        photon_initial_state = True
         if pythia.event[5].id() == 22:
             purejet = pythia.event[5]
             quenchedjet = pythia.event[6]
@@ -335,6 +336,7 @@ while i < nevt:
             purejet = pythia.event[6]
             quenchedjet = pythia.event[5]
         else:
+            photon_initial_state = False
             if random.randint(1, 2) == 1:
                 purejet = pythia.event[5]
                 quenchedjet = pythia.event[6]
