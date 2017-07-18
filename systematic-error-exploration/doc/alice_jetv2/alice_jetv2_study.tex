@@ -53,16 +53,16 @@ This work is motivated by the need to select a data format that can accommodate 
     \begin{figure}[h]
 \begin{center}
         \includegraphics[width=.5\textwidth]{figures/data}
-        \caption{Second-order harmonic coefficient $v_2^{\rm ch\ jet}$ as a function of $p_T$) for 0--5\% collision centrality, reproduced from Fig.~4a of~\cite{Adam:2016ix}.  The error bars on the points represent statistical uncertainties, the open and shaded boxes indicate the shape and correlated uncertainties as explained in Sec.~2.5 of~\cite{Adam:2016ix}.}
+        \caption{Second-order harmonic coefficient $v_2^{ch\ jet}$ as a function of $p_T$) for 0--5\% collision centrality, reproduced from Fig.~4a of~\cite{Adam:2016ix}.  The error bars on the points represent statistical uncertainties, the open and shaded boxes indicate the shape and correlated uncertainties as explained in Sec.~2.5 of~\cite{Adam:2016ix}.}
         \label{fig:data}
 \end{center}
     \end{figure}
 
 The significance test calculation done by the ALICE collaboration used the following equation:
 \begin{equation}\label{eq:chisq_org}
-    \tilde{\chi}^2 (\epsilon_{\rm corr}, \epsilon_{\rm shape}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{\rm corr} \sigma_{\rm corr, i} + \epsilon_{\rm shape} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{\rm corr}^2 +  \frac{1}{n}\sum_{i=1}^{n} \frac{\epsilon_{\rm shape}^2}{\sigma^2_{\rm shape, i}}   \right]
+    \tilde{\chi}^2 (\epsilon_{corr}, \epsilon_{shape}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{corr} \sigma_{corr, i} + \epsilon_{shape} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{corr}^2 +  \frac{1}{n}\sum_{i=1}^{n} \frac{\epsilon_{shape}^2}{\sigma^2_{shape, i}}   \right]
 \end{equation}
-$\mu_i$ is the hypothesis against which we are testing the data, which is 0 in our case. $\sigma_{\rm corr, i}$ and $\sigma_{\rm shape, i}$ are the correlated and shape uncertainties on the $i$-th bin, and $\sigma_i$ is the uncorrelated uncertainty on the $i$-th bin. $\epsilon_{\rm corr}$ and $\epsilon_{\rm shape}$ are free parameters with respect to which the $\tilde{\chi}^2$ is minimized. This minimization was done using the \texttt{iminuit} package in Python. Using the minimized $\tilde{\chi}^2$, the $p$-value was obtained by using the \texttt{chisqprob} method with $n - 2$ degrees of freedom from the Python scipy statistics library. Using this approach, we were able to verify the results published by the ALICE collaboration.
+$\mu_i$ is the hypothesis against which we are testing the data, which is 0 in our case. $\sigma_{corr, i}$ and $\sigma_{shape, i}$ are the correlated and shape uncertainties on the $i$-th bin, and $\sigma_i$ is the uncorrelated uncertainty on the $i$-th bin. $\epsilon_{corr}$ and $\epsilon_{shape}$ are free parameters with respect to which the $\tilde{\chi}^2$ is minimized. This minimization was done using the \texttt{iminuit} package in Python. Using the minimized $\tilde{\chi}^2$, the $p$-value was obtained by using the \texttt{chisqprob} method with $n - 2$ degrees of freedom from the Python scipy statistics library. Using this approach, we were able to verify the results published by the ALICE collaboration.
 
 \begin{table}[h]
 \begin{center}
@@ -83,17 +83,17 @@ $p_T$ range & ALICE & LLNL \\
 
 It can be shown that (\ref{eq:chisq_org}) can be re-expessed in the form:
 \begin{equation}\label{chisq_eff}
-    \tilde{\chi}^2 (\epsilon_{\rm corr}, \epsilon_{\rm new}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{\rm corr} \sigma_{\rm corr, i} + \epsilon_{\rm new} \sigma_{\rm new} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{\rm corr}^2 + \epsilon_{\rm new}^2 \right]
+    \tilde{\chi}^2 (\epsilon_{corr}, \epsilon_{new}) = \left[ \left( \sum_{i=1}^{n} \frac{(v_{2, i} + \epsilon_{corr} \sigma_{corr, i} + \epsilon_{new} \sigma_{new} - \mu_i)^2}{\sigma^2_i} \right)+ \epsilon_{corr}^2 + \epsilon_{new}^2 \right]
 \end{equation}
 \begin{equation}\label{sigma_new}
-    \sigma_{\rm new} = \frac{1}{n}\sum_{i=1}^{n} \frac{1}{\sigma^2_{\rm shape, i}}
+    \sigma_{new} = \frac{1}{n}\sum_{i=1}^{n} \frac{1}{\sigma^2_{shape, i}}
 \end{equation}
 \begin{equation}\label{eps_new}
-    \epsilon_{\rm new} = \frac{\epsilon_{\rm shape}}{\sigma_{\rm new}}
+    \epsilon_{new} = \frac{\epsilon_{shape}}{\sigma_{new}}
 \end{equation}
-$\sigma_{\rm new}$ is effectively a uniform, fully-correlated error, indepedent from $\sigma_{\rm corr, i}$. With the $\chi^2$ expressed in this form, we map this to an equivalent covariance matrix formulation of the minimization, following the derivations given in~\cite{Demortier:1999aa,Gao:2014cp}, where this equivalence has been shown to be exact in cases where the minimization formulation is performed without constraints.  With the covariance matrix:
+$\sigma_{new}$ is effectively a uniform, fully-correlated error, indepedent from $\sigma_{corr, i}$. With the $\chi^2$ expressed in this form, we map this to an equivalent covariance matrix formulation of the minimization, following the derivations given in~\cite{Demortier:1999aa,Gao:2014cp}, where this equivalence has been shown to be exact in cases where the minimization formulation is performed without constraints.  With the covariance matrix:
 \begin{equation}\label{covariance_matrix}
-    C_{ij} = \sigma_i^2 \delta_{ij} + \sigma_{\rm corr, i} \sigma_{\rm corr, j} + \sigma_{\rm new} \sigma_{\rm new}
+    C_{ij} = \sigma_i^2 \delta_{ij} + \sigma_{corr, i} \sigma_{corr, j} + \sigma_{new} \sigma_{new}
 \end{equation}
 the minimized $\chi^2$ can be calculated by:
 \begin{equation}\label{cov_mat_chi2_min}
