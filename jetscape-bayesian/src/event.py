@@ -12,7 +12,8 @@ import subprocess
 
 class EventGenerator(object):
 
-    def __init__(self, save_directory, pythia_settings=None):
+    def __init__(self, save_directory=None, preset='RHIC',
+                 pythia_settings=None):
         pass
 
     def generate(self):
@@ -21,7 +22,8 @@ class EventGenerator(object):
 
 class BackgroundGenerator(object):
 
-    def __init__(self, projectile1, projectile2):
+    def __init__(self, save_directory=None, projectile1='Au',
+                 projectile2='Au'):
         pass
 
     def generate(self):
