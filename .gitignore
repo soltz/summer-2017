@@ -47,3 +47,11 @@ pythia/
 data/
 fudge/
 fastjet/
+fudge*/
+
+# Package Build/Install Directories #
+#####################################
+*.egg-info/
+build/
+dist/
+
