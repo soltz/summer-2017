@@ -1,0 +1,339 @@
+\documentclass[final]{beamer} % beamer 3.10: do NOT use option hyperref={pdfpagelabels=false} !
+\usetheme{Berlin}     
+\usepackage[orientation=landscape,size=a0,scale=1]{beamerposter} 
+\usepackage[absolute, overlay]{textpos}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+
+
+% \Huge
+% \huge
+% \LARGE
+% \Large
+% \large
+% \normalsize (default)
+% \small
+\makeatletter %only needed in preamble
+\renewcommand\Huge{\@setfontsize\Huge{96pt}{96}}
+\makeatother
+\makeatletter %only needed in preamble
+\renewcommand\huge{\@setfontsize\huge{50pt}{56}}
+\makeatother
+\makeatletter %only needed in preamble
+\renewcommand\LARGE{\@setfontsize\LARGE{56pt}{56}}
+\makeatother
+\makeatletter %only needed in preamble
+\renewcommand\Large{\@setfontsize\Large{36pt}{42}}
+\makeatother
+\makeatletter %only needed in preamble
+\renewcommand\large{\@setfontsize\large{42pt}{42}}
+\makeatother
+\makeatletter %only needed in preamble
+\renewcommand\small{\@setfontsize\small{28pt}{36}}
+\makeatother
+
+% set up relative scale hsize, vsize = 1 is full width, full length respectively. this makes rescaling easy.
+\setlength{\TPHorizModule}{118.9cm}
+\setlength{\TPVertModule}{84.1cm}
+
+% - PYTHIA EVENT SIMULATION
+%  - why
+%  - goal
+
+% - COMPARING MODEL TO EXPERIMENT
+%  - need to be careful how errors are treated on both sides
+%  - understanding this is essential to verifying consistency between data and model
+
+% - TRADITIONAL VS COVARIANT ERRORS
+%  - traditional defines uncorrelated and fully correlated errors
+%  - covariance defines matrix (equation here)
+%   - is strictly more general
+%   - allows for careful treatment of correlation lengths
+
+% - COVARIANCE FORMALISM APPLIED TO PREVIOUS RESULTS
+%  - explain ALICE experiment
+%  - results verified in covariance matrix chisq calculation
+%  - explain how unfolding errors maybe better treated by covariance matrix
+
+% - INCORPORATING COVARIANCE INTO HEPDATA
+%  - extended HEPData to support full covariance matrices
+%  - support for concise representation of simpler errors (fully corr, uncorr) maintained
+%  - advocate move of experimental results to publish covariance matrices rather than bin by bin errors
+
+% - FUTURE WORK
+%  - work still needs to be done on quenching detection
+%  - HEPdata covariance needs to be adopted
+%  - ???
+   
+\begin{document}
+\begin{frame}
+\setlength\multicolsep{0pt}
+
+% logos
+\begingroup
+  \begin{textblock}{0.18}(0.0, 0.025)
+    \begin{center}
+      \includegraphics[width=0.6\textwidth]{logos/lab_logo_blue}
+    \end{center}
+  \end{textblock}
+  \begin{textblock}{0.18}(0.82, 0.025)
+    \begin{center}
+      \includegraphics[width=0.8\textwidth]{logos/TheOhioStateUniversity-StackedK-RGBHEX}
+    \end{center}
+  \end{textblock}
+\endgroup
+
+% title block
+\begingroup
+  \Huge
+  \begin{textblock}{0.64}(0.18, 0.025)
+    \begin{block}{\centering Understanding Uncertainties in Jet Quenching in \\ High-Energy Nucleus-Nucleus Collisions}
+      \huge
+      \begin{center}
+        M. Heinz, R. Soltz\\
+        Lawrence Livermore National Lab, Livermore, CA - USA
+      \end{center}
+    \end{block}
+  \end{textblock}
+\endgroup
+
+% column 1
+\begingroup
+  \LARGE
+  \begin{textblock}{0.3}(0.02, 0.20)
+    %\vspace{1.5cm}
+    \LARGE
+    \begin{block}{Introduction to Jet Physics}
+      \Large
+      \begin{itemize}
+        \item Two dominant processes in high-energy nuclear collisions
+        \begin{itemize}
+          \Large
+          \item Energy deposited as nuclei interact heats vacuum to form a quark gluon plasma (QGP)
+          \item Hard scattering of partons in nucleons creating jets
+        \end{itemize}
+        % \item Outgoing hard scattered particles will radiate and decay
+        % \item But these processes will keep the scattered energy in a cone
+        \item Jets must pass through the QGP and interact with it
+        \item As a result, jets can function as a probe into the structure of QGP
+        % \item Looking for variations in observables and jet energy quenching
+        % \item Explain high-energy collisions (hard-scattering, QGP)
+        % \item Explain jets as a result of hard scattering
+        % \item Explain jets as a probe of QGP structure (quenching)
+      \end{itemize}
+    \end{block}
+
+    \vspace{0.2cm}
+    
+    \begin{center}
+     % annnotate JET & QUENCHED JET
+      \includegraphics[trim={0 6.5cm 0 6.5cm},clip,width=0.6\textwidth]{figures/HI-DijetSupp-151076-1328520-RhoPhi-huge}
+    \end{center}
+
+    \vspace{0.2cm}
+
+    \LARGE
+    \begin{block}{Comparing Model and Experiment}
+      \Large
+      \begin{itemize}
+        \item Goal is to compare models of jet quenching via medium with experimental results
+        \item Must be careful with how statistical and systematic uncertainties are handled
+        \item Understanding in detail the nature of uncertainties is essential to verifying consistency between theory and experiment
+      \end{itemize}
+    \end{block}
+
+    \vspace{1.0cm}
+
+    \begin{block}{Sample Measurement from ALICE}
+      \begin{center}
+        \includegraphics[width=0.6\textwidth]{figures/ALICE_data}
+      \end{center}
+    \end{block}
+
+    \vspace{1.0cm}
+
+    % \LARGE
+    % \begin{block}{Testing Model on Simulated Jet Events}
+    %   \Large
+    %   \begin{itemize}
+    %     \item Must be able to numerically identify jet quench factor from experimental data
+    %     % \item General approach:
+    %     \begin{itemize}
+    %       \Large
+    %       \item Simulate jet events with one jet manually quenched (many quench factors)
+    %       \item Run jet finder and generate training data for model
+    %       \item Generate independent data with single quench to feed into model
+    %       \item Compute posterior distribution of quench value
+    %       % \item Simulate jet events using PYTHIA and TRENTO libraries
+    %       % \item Manually quench the particles of non-photon jet
+    %       % \item Run jet finder on events and compute $x_{gj}$
+    %       % \item Train model with large data set with many different quench factors
+    %       % \item Feed in data from new events with single quench factor and compute posterior distribution for quench factor
+    %     \end{itemize}
+    %   \end{itemize}
+    % \end{block}
+
+    % % \vspace{0.5cm}
+    
+    % \begin{center}
+    %   \includegraphics[width=0.6\textwidth]{figures/density_no_0}
+    % \end{center}
+
+  \end{textblock}
+\endgroup
+
+
+
+% column 2
+\begingroup
+  \begin{textblock}{0.3}(0.35, 0.20)
+    % \LARGE
+    % \begin{block}{Comparing Model and Experiment}
+    %   \Large
+    %   \begin{itemize}
+    %     \item Goal is to compare models of jet quenching via medium with experimental results
+    %     \item Must be careful with how statistical and systematic uncertainties are handled
+    %     \item Understanding in detail the nature of uncertainties is essential to verifying consistency between theory and experiment
+    %   \end{itemize}
+    % \end{block}
+
+    % \vspace{1.0cm}
+
+    \LARGE
+    \begin{block}{Traditional vs Covariant Treatment of Errors}
+      \Large
+      \begin{itemize}
+        \item Current errors given bin by bin
+        \item Statistical errors assumed to be uncorrelated
+        \item Other uncorrelated systematics lumped in with statistical errors
+        \item Any correlated systematics are fully correlated across all bins
+        \item Covariance matrix defined as:
+      \end{itemize}
+      \begin{center}
+        $C_{ij} = \rho_{ij} \sigma_i \sigma_j$
+      \end{center}
+      \begin{itemize}
+        \item $\rho_{ij}$ is the covariance coefficient between the $i^{th}$ and $j^{th}$ bins
+        \item For uncorrelated errors, $\rho_{ij} = \delta_{ij}$
+        \item For fully correlated errors, $\rho_{ij} = 1$
+        \item Covariance matrix formulation of errors allows for non-uniform covariance
+        \item In particular, it supports errors with a correlation length
+      \end{itemize}
+    \end{block}
+
+    \vspace{2.0cm}
+
+    \LARGE
+    \begin{block}{Apply Covariance Formalism to Previous Result}
+      \Large
+      \begin{itemize}
+        \item ALICE measurement of $v_2$ provides good test for covariance formalism equivalence
+        \item Has uncorrelated, correlated, and shape uncertainties
+        \item $p$-values published in paper are obtained by minimizing $\chi^2$
+        \item Equivalent calculation of minimized $\chi^2$ via covariance matrices looks like:
+      \end{itemize}
+      \begin{center}
+        $\chi^2_{min} = \Delta^T C^{-1} \Delta$
+      \end{center}
+      \begin{itemize}
+        \item Resulting $p$-values are exactly equal:
+      \end{itemize}
+      \begin{table}[h]
+      \begin{center}
+      \begin{tabular}{ l r r }
+        % & \multicolumn{2}{c}{$p$-value} \\
+      $p_T$ range & $\chi^2$ minimization & Covariance matrix \\
+      \hline
+      30-100 GeV & 0.1247858497 & 0.1247858497 \\ 
+      30-60 GeV & 0.0685915881 & 0.0685915881 \\ 
+      60-100 GeV & 0.0211009165 & 0.0211009165 \\
+      % \hline
+      \end{tabular}
+      \caption{$p$-values reported to machine level significance calculated using traditional $\chi^2$ minimization and covariance method.}
+      \end{center}
+      \end{table}
+    \end{block}
+
+  \end{textblock}
+\endgroup
+
+% column 3
+\begingroup
+  \begin{textblock}{0.3}(0.68, 0.20)
+
+    
+
+    \LARGE
+    \begin{block}{Incorperating Covariance into HEPData}
+      \Large
+      \begin{itemize}
+        \item Current HEPData schema lacks support for full covariance matrices
+        \item Adapted schema to support:
+        \begin{itemize}
+          \Large
+          \item (A)symmetric uncorrelated errors
+          \item (A)symmetric fully correlated errors
+          \item Full covariance matrices
+        \end{itemize}
+        \item Distinct treatment of uncorrelated and fully correlated errors to save space
+        \item Would like to see adoption of this modified schema by the HEPData community for future experimental results
+      \end{itemize}
+    \end{block}
+
+    \vspace{1.0cm}
+
+    \LARGE
+    \begin{block}{Future Work}
+      \Large
+      \begin{itemize}
+        \item Continue work to develop jet quench simulation tool to study errors
+        \item Constrain jet quench parameter with Bayesian methods
+        \item Estimate subtraction bias
+        \item Consider software-level checks for HEPData validity
+        \item Advocate for a move to covariance matrix expression of uncertainties
+      \end{itemize}
+    \end{block}
+
+    % \vspace{1.00cm}
+
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{figures/pythia_trento_display}
+    \end{center}
+
+%     % TODO: Go through and do appropriate citations
+    \large
+    % \LARGE
+    \begin{block}{References}
+      \small
+      % \Large
+      [1] J. Adam {\it et al.} [ALICE Collaboration], Azimuthal anisotropy of charged jet production in $\sqrt{s_{NN}}$=2.76~TeV Pb-Pb collisions, {\it J. Phys. Lett. B}, 753, 511 (2016).
+
+      [2] L. Demortier, Equivalence of the best-fit and covariance-matrix methods for comparing binned data with a model in the presence of correlated systematic uncertainties, CDF-MEMO-8661 (1999).
+
+      [3] J. Gao, {\it et al.}, CT10 next-to-next-to-leading order global analysis of QCD, {\it Phys. Rev. D} 89, 03309 (2014).
+
+      % [4] PYTHIA?
+
+      % [5] TRENTO?
+
+    \end{block}
+  \end{textblock}
+\endgroup
+
+% auspices and release
+\begingroup
+  \begin{textblock}{0.7}(0.005, 0.965)
+    \small
+    This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344.
+  \end{textblock}
+  \begin{textblock}{0.3}(0.695, 0.965)
+    \small
+    \begin{flushright}
+      LLNL-TR-xxxxxx
+    \end{flushright}
+  \end{textblock}
+\endgroup
+
+\end{frame}
+\end{document}  
