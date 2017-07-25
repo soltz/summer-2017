@@ -70,8 +70,10 @@ class BackgroundGenerator(object):
 
 # ----------------------------- Internal Methods ---------------------------- #
 
+
 def _load_pdg_data():
     pass
+
 
 def _generate_cmf():
     pass
