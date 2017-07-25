@@ -46,6 +46,7 @@ import subprocess
 from future.moves.urllib.request import urlopen
 from future.moves.urllib.error import HTTPError
 from future.moves.urllib.error import URLError
+from shutil import copyfileobj
 
 
 class EventGenerator(object):
@@ -72,7 +73,77 @@ class BackgroundGenerator(object):
 
 
 def _load_pdg_data():
-    pass
+    # Set up URL and filename format using <current year> as the default
+    year = int(strftime("%Y", gmtime()))
+    url = 'http://pdg.lbl.gov/{0}/mcdata/mass_width_{0}.mcd'
+    filename = 'mass_width_{}.mcd'
+
+    # Create data directory if it doesn't exist already
+    save_dir = '~/.pdg_data/'
+    save_dir = _create_dir(save_dir)
+
+    # Try getting data from URL with <current year>
+    try:
+        response = urlopen(url.format(year))
+    except HTTPError:
+        # If <current year> does not exist, look for previous year
+        # (previous year is guaranteed to exist)
+        try:
+            reponse = urlopen(url.format(year - 1))
+            year -= 1
+        except HTTPError:
+            print('Warning:')
+            print('\tUnable to get most recent particle data.')
+            print('\tPDG site is unexpectedly causing an HTTPError.')
+            print('\tAttempting to load a local copy of the data.\n')
+            response = None
+        except URLError:
+            print('Warning:')
+            print('\tUnable to get most recent particle data.')
+            print('\tYou are probably not connected to the internet.')
+            print('\tAttempting to load a local copy of the data.\n')
+            response = None
+    except URLError:
+        print('Warning:')
+        print('\tUnable to get most recent particle data.')
+        print('\tYou are probably not connected to the internet.')
+        print('\tAttempting to load a local copy of the data.\n')
+        response = None
+
+    # If response exists, save it to file
+    if response:
+        with open(save_dir + '/' + filename.format(year), 'wb') as f:
+            copyfileobj(response, f)
+        response.close()
+
+    # Open most recent local copy of mass data
+    file = None
+    while year >= 2017 and not file:
+        try:
+            file = open(save_dir + '/' + filename.format(year), 'r')
+        # Note: terrible catch-all required for Python 2 and 3 compatiblity
+        #       should look into alternatives that don't surpress
+        #       unexpected behavior
+        except Exception:
+            year -= 1
+
+    # If file failed to open, return False
+    if not file:
+        print('Warning:')
+        print('\tUnable to load data from local file.\n')
+        return False
+
+    # Load file contents and close file
+    content = file.readlines()
+    file.close()
+
+    # Strip trailing newlines
+    content = [x.rstrip() for x in content]
+
+    # Remove header lines and reformat data
+    data = [_format_line(x) for x in content if x[0] != '*']
+
+    return data
 
 
 def _generate_cmf():
