@@ -146,5 +146,38 @@ def _load_pdg_data():
     return data
 
 
+def _format_line(line):
+    # Extract particle ids as list
+    pids = line[0:32].split()
+
+    # Extract mass
+    mass = float(line[33:51])
+
+    # Extract errors on mass as list
+    m_err = [float(x) for x in line[52:69].split()]
+
+    # Extract width if it exists
+    width = line[70:88]
+    if width.isspace():
+        width = None
+    else:
+        width = float(width)
+
+    # Extract errors on width as list if they exist
+    w_err = line[89:106]
+    if w_err.isspace():
+        w_err = None
+    else:
+        w_err = [float(x) for x in w_err.split()]
+
+    # Extract name
+    name = line[107:].split()[0]
+
+    # Allow the rest to be list of charges
+    charges = line[107:].split()[1].strip().split(',')
+
+    return [pids, mass, m_err, width, w_err, name, charges]
+
+
 def _generate_cmf():
     pass
