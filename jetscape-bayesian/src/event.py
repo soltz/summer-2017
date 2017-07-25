@@ -63,3 +63,12 @@ class BackgroundGenerator(object):
 
     def generate(self):
         return ''
+
+
+# ----------------------------- Internal Methods ---------------------------- #
+
+def _load_pdg_data():
+    pass
+
+def _generate_cmf():
+    pass
