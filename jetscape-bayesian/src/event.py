@@ -43,6 +43,9 @@ import numpy as np
 from time import gmtime, strftime
 import pythia8
 import subprocess
+from future.moves.urllib.request import urlopen
+from future.moves.urllib.error import HTTPError
+from future.moves.urllib.error import URLError
 
 
 class EventGenerator(object):
