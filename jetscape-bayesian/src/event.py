@@ -181,3 +181,16 @@ def _format_line(line):
 
 def _generate_cmf():
     pass
+
+
+def _create_dir(path):
+    if path[0] == '~':
+        path = path[2:]
+        home = os.path.expanduser('~')
+        path = os.path.join(home, path)
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+    return str(os.path.abspath(path))
