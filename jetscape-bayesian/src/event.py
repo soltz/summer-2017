@@ -47,6 +47,8 @@ from future.moves.urllib.request import urlopen
 from future.moves.urllib.error import HTTPError
 from future.moves.urllib.error import URLError
 from shutil import copyfileobj
+import bisect
+import random
 
 
 class EventGenerator(object):
