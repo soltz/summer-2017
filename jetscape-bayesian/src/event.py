@@ -259,8 +259,32 @@ def _generate_cmf(temp):
     return cmf_func
 
 
-def _n_i(temp, mass, degen, chem_pot=0):
-    return degen
+def _n_i(temp, mass, degen, chem_pot=0, eps=1.0 * 10**(-8)):
+    # Compute scale factor for sum
+    scale = temp * degen / (2 * np.pi**2)
+
+    # Set flag based on fermion or boson
+    if degen % 2 == 0:
+        flag = -1
+    else:
+        flag = 1
+
+    # Compute lambda
+    # Note: this will be different if chem_pot != 0
+    lam = 1
+
+    # Compute series until sufficiently converged
+    series_sum = 0
+    k = 1
+    while series_sum == 0 or abs(term / series_sum) > eps:
+        term = flag**(k + 1) / k * lam**2 * mass**2
+        # Use scipy modified Bessel function of second kind
+        term *= scipy.special.kn(2, k * mass / temp)
+        series_sum += term
+        k += 1
+
+    # Scale sum and return
+    return scale * series_sum
 
 
 def _create_dir(path):
