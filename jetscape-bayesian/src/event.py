@@ -162,6 +162,7 @@ def _load_pdg_data(make_dict=True):
 def _format_line(line):
     # Extract particle ids as list
     pids = line[0:32].split()
+    pids = [int(i) for i in pids]
 
     # Extract mass
     mass = float(line[33:51])
