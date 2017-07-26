@@ -72,7 +72,7 @@ class BackgroundGenerator(object):
 # ----------------------------- Internal Methods ---------------------------- #
 
 
-def _load_pdg_data():
+def _load_pdg_data(make_dict=True):
     # Set up URL and filename format using <current year> as the default
     year = int(strftime("%Y", gmtime()))
     url = 'http://pdg.lbl.gov/{0}/mcdata/mass_width_{0}.mcd'
@@ -148,6 +148,13 @@ def _load_pdg_data():
             for i in range(len(line[0])):
                 temp_data = [line[0][i]] + line[1:6] + [line[6][i]]
                 data.append(temp_data)
+
+    if make_dict:
+        # Make data a dict for faster retrieval
+        data_dict = {}
+        for x in data:
+            data_dict[x[5] + x[6]] = x
+        data = data_dict
 
     return data
 
