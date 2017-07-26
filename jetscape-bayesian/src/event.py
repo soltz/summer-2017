@@ -155,7 +155,7 @@ def _load_pdg_data(make_dict=True):
         # Make data a dict for faster retrieval
         data_dict = {}
         for x in data:
-            data_dict[x[5] + x[6]] = x
+            data_dict[x[0]] = x
         data = data_dict
 
     return data
