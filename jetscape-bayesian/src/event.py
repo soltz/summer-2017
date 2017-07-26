@@ -195,8 +195,73 @@ def _format_line(line):
     return [pids, mass, m_err, width, w_err, name, charges]
 
 
-def _generate_cmf():
-    pass
+def _generate_cmf(temp):
+    # Set up dict to retreive relevant particles
+    # Note: this may require updating as naming is updated
+    particles = {'pi+': 211, 'pi-': 211, 'pi0': 111, 'K+': 321,
+                 'K-': 321, 'K(L)': 130, 'K(S)': 310, 'p': 2212,
+                 'pbar': 2212, 'n': 2112, 'nbar': 2112}
+
+    # Set up charge switching dict for anti-particles
+    switch_charge = {'+': '-', '-': '+', '0': '0'}
+
+    # Get full particle data
+    full_particle_data = _load_pdg_data(make_dict=True)
+
+    # Initialize list for relevant particle data
+    particle_data = []
+
+    # Iterate over particle keys
+    for i in particles:
+        # Get values (copy list, rather than alias)
+        values = list(full_particle_data[particles[i]])
+
+        # Negate id and switch charge if anti-particle
+        if (i[-1] == '-') or (i[-3:] == 'bar'):
+            values[0] *= -1
+            values[6] = switch_charge[values[6]]
+
+        # Assign canonical name
+        values[5] = i
+
+        # Assign spin-isospin degeneracy
+        if values[0] in (130, 310):
+            values.append(1)
+        else:
+            values.append(int(str(values[0])[-1]))
+
+        # Add particle to particle data
+        particle_data.append(values)
+
+    # Initialize dict for particle-specific densities
+    partition_dict = {}
+
+    # Compute density of states for each particle and total density
+    densities = [_n_i(x[1], x[5], x[7]) for x in particle_data]
+    total_density = sum(densities)
+
+    # Project out important info for each particle
+    particle_info = [(x[0], x[1], x[5]) for x in particle_data]
+
+    # Compute probability of sampling each particle (multinomial)
+    probabilities = [x / total_density for x in densities]
+
+    # Compute cumulative mass function from probabilities
+    cmf = []
+    for i in range(len(probabilities)):
+        cmf.append(sum(probabilities[:i]) + probabilities[i])
+
+    # Define function to give particle info based on random value x in [0, 1)
+    def cmf_func(x, cmf=cmf, info=particle_info):
+        index = bisect.bisect_left(cmf, x)
+        return info[index]
+
+    # Return function for use by the caller
+    return cmf_func
+
+
+def _n_i(temp, mass, degen, chem_pot=0):
+    return degen
 
 
 def _create_dir(path):
