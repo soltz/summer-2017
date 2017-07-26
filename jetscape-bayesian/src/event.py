@@ -238,7 +238,7 @@ def _generate_cmf(temp):
     partition_dict = {}
 
     # Compute density of states for each particle and total density
-    densities = [_n_i(x[1], x[5], x[7]) for x in particle_data]
+    densities = [_n_i(temp, x[1], x[7]) for x in particle_data]
     total_density = sum(densities)
 
     # Project out important info for each particle
