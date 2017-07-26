@@ -141,7 +141,13 @@ def _load_pdg_data():
     content = [x.rstrip() for x in content]
 
     # Remove header lines and reformat data
-    data = [_format_line(x) for x in content if x[0] != '*']
+    data = []
+    for x in content:
+        if x[0] != '*':
+            line = _format_line(x)
+            for i in range(len(line[0])):
+                temp_data = [line[0][i]] + line[1:6] + [line[6][i]]
+                data.append(temp_data)
 
     return data
 
