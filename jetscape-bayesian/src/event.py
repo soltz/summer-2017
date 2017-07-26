@@ -244,12 +244,10 @@ def _generate_cmf(temp):
     particle_info = [(x[0], x[1], x[5]) for x in particle_data]
 
     # Compute probability of sampling each particle (multinomial)
-    probabilities = [x / total_density for x in densities]
+    prob = [x / total_density for x in densities]
 
     # Compute cumulative mass function from probabilities
-    cmf = []
-    for i in range(len(probabilities)):
-        cmf.append(sum(probabilities[:i]) + probabilities[i])
+    cmf = [sum(prob[:i]) + prob[i] for i in range(len(prob))]
 
     # Define function to give particle info based on random value x in [0, 1)
     def cmf_func(x, cmf=cmf, info=particle_info):
