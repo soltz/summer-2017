@@ -49,6 +49,7 @@ from future.moves.urllib.error import URLError
 from shutil import copyfileobj
 import bisect
 import random
+import scipy.special
 
 
 class EventGenerator(object):
