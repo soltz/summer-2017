@@ -3,6 +3,7 @@
 #include "HepMC/GenEvent.h"
 #include "HepMC/SimpleVector.h"
 #include <fastjet/PseudoJet.hh>
+#include <fastjet/ClusterSequence.hh>
 
 std::vector<fastjet::PseudoJet> prep_single_event(HepMC::GenEvent* evt) {
 
@@ -92,4 +93,28 @@ double tag_max_pt_photon(std::vector<fastjet::PseudoJet>& p) {
   } else {
     return 0.0;
   }
+}
+
+bool contains_tagged_photon(const fastjet::ClusterSequence& clust,
+                            const fastjet::PseudoJet& jet) {
+  std::vector<fastjet::PseudoJet> jet_const = clust.constituents(jet);
+  bool found = false;
+  for (int j = 0; j < jet_const.size(); j++) {
+    if (jet_const[j].user_index() == -1) {
+      found = true;
+    }
+  }
+  return found;
+}
+
+int locate_tagged_photon(const fastjet::ClusterSequence& clust,
+                         const std::vector<fastjet::PseudoJet>& jets) {
+  int index = -1;
+  for (int i = 0; i < jets.size(); i++) {
+    if (contains_tagged_photon(clust, jets[0])) {
+      index = i;
+      break;
+    }
+  }
+  return index;
 }
