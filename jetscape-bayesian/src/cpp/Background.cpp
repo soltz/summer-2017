@@ -115,14 +115,8 @@ std::string BackgroundGenerator::generate() {
   // Generate the event based on computed multiplicity
   gen_event(bg_evt, mult);
 
-  std::time_t time = std::time(nullptr);
-  char date_buffer[80];
-  struct tm * timeinfo = gmtime(&time);
-  strftime(date_buffer, 80, "%Y.%m.%d.%T", timeinfo);
-  std::string date_str(date_buffer);
-  std::string filename("EventBackground_" + date_str + "-" 
-                       + std::to_string(degen_factor) + ".hepmc");
-  degen_factor += 1;
+  // Get filename
+  std::string filename = get_filename();
 
   // Save event to file (ascii_out closes as it goes out of scope)
   HepMC::IO_GenEvent ascii_out(directory + filename, std::ios::out);
@@ -196,6 +190,27 @@ int BackgroundGenerator::get_event_mult() {
   int mult = compute_mult(entropy, 4.65905256, ch_to_n_ratio);
 
   return mult;
+}
+
+std::string BackgroundGenerator::get_filename() {
+
+  // Get time
+  std::time_t time = std::time(nullptr);
+
+  // Convert time to string format
+  char date_buffer[80];
+  struct tm * timeinfo = gmtime(&time);
+  strftime(date_buffer, 80, "%Y.%m.%d.%T", timeinfo);
+  std::string date_str(date_buffer);
+
+  // Assemble filename
+  std::string filename("EventBackground_" + date_str + "-"
+                       + std::to_string(degen_factor) + ".hepmc");
+
+  // Increment degeneracy factor to prevent overwriting
+  degen_factor += 1;
+
+  return filename;
 }
 
 /* ----------------------------- Particle ---------------------------- */

@@ -109,14 +109,8 @@ std::string EventGenerator::generate() {
   // Generate jet event
   gen_event(evt, q);  
 
-  std::time_t time = std::time(nullptr);
-  char date_buffer[80];
-  struct tm * timeinfo = gmtime(&time);
-  strftime(date_buffer, 80, "%Y.%m.%d.%T", timeinfo);
-  std::string date_str(date_buffer);
-  std::string filename("EventJets_" + date_str + "-"
-                       + std::to_string(degen_factor) + ".hepmc");
-  degen_factor += 1;
+  // Get filename
+  std::string filename = get_filename();
 
   // Save event to file (ascii_out closes as it goes out of scope)
   HepMC::IO_GenEvent ascii_out(directory + filename, std::ios::out);
@@ -175,4 +169,25 @@ void EventGenerator::gen_event(HepMC::GenEvent* evt, double quench) {
 
   // Reset PYTHIA object
   pythia.event.reset();
+}
+
+std::string EventGenerator::get_filename() {
+
+  // Get time
+  std::time_t time = std::time(nullptr);
+
+  // Convert time to string format
+  char date_buffer[80];
+  struct tm * timeinfo = gmtime(&time);
+  strftime(date_buffer, 80, "%Y.%m.%d.%T", timeinfo);
+  std::string date_str(date_buffer);
+
+  // Assemble filename
+  std::string filename("EventJets_" + date_str + "-"
+                       + std::to_string(degen_factor) + ".hepmc");
+
+  // Increment degeneracy factor to prevent overwriting
+  degen_factor += 1;
+
+  return filename;
 }

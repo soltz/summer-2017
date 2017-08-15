@@ -214,6 +214,7 @@ private:
   // Private internal methods
   void gen_event(HepMC::GenEvent* evt, int mult);
   int get_event_mult();
+  std::string get_filename();
 
 public:
 

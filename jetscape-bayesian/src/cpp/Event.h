@@ -53,6 +53,7 @@ private:
 
   // Private internal methods
   void gen_event(HepMC::GenEvent* evt, double quench);
+  std::string get_filename();
 
 public:
 
