@@ -1,10 +1,10 @@
 # Dependencies
 
-- (HepMC)[http://hepmc.web.cern.ch/hepmc/]
-- (Pythia8)[http://home.thep.lu.se/~torbjorn/Pythia.html]
-- (fastjet)[http://fastjet.fr/]
-- (Boost)[http://www.boost.org/]
-- (JSON)[https://github.com/nlohmann/json]
+- [HepMC](http://hepmc.web.cern.ch/hepmc/)
+- [Pythia8](http://home.thep.lu.se/~torbjorn/Pythia.html)
+- [fastjet](http://fastjet.fr/)
+- [Boost](http://www.boost.org/)
+- [JSON](https://github.com/nlohmann/json)
 
 # Setup
 
