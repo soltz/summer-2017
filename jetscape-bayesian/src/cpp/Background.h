@@ -25,6 +25,9 @@ Members (with accessors defined):
   name :
     non-standard name of particle from PDG listing (should not be used as
     an identifier)
+  charge :
+    string representation of charged used to compute charge to total particle
+    ratio
   px, py, pz :
     components of the 3-momentum of the particle
   charge :
@@ -53,6 +56,7 @@ private:
   int pid_;
   double mass_;
   std::string name_;
+  std::string charge_;
   double px_ = 0.0;
   double py_ = 0.0;
   double pz_ = 0.0;
@@ -60,7 +64,7 @@ private:
 public:
 
   // Constructors
-  Particle(int pid, double mass, std::string name);
+  Particle(int pid, double mass, std::string name, std::string charge);
   Particle(const Particle& that);
   Particle& operator=(const Particle& that);
 
@@ -74,12 +78,14 @@ public:
   int pid() { return pid_; }
   double mass() { return mass_; }
   std::string name() { return name_; }
+  std::string charge() { return charge_; }
   double px() { return px_; }
   double py() { return py_; }
   double pz() { return pz_; }
   void pid(int x) { pid_ = x; }
   void mass(double x) { mass_ = x; }
   void name(std::string x) { name_ = std::string(x); }
+  void charge(std::string x) { charge_ = std::string(x); }
   void px(double x) { px_ = x; }
   void py(double x) { py_ = x; }
   void pz(double x) { pz_ = x; }
@@ -98,6 +104,8 @@ Members:
     vector of particles with positions corresponding to values in v
   temp :
     temperature of freezeout used to sample momenta
+  charge_ratio :
+    ratio of total particles to charged particles
 
 Methods:
   CMF() :
@@ -122,6 +130,7 @@ private:
   std::vector<double> v;
   std::vector<Particle> p;
   double temp;
+  double charge_ratio_;
 
 public:
 
@@ -132,6 +141,7 @@ public:
 
   // Methods
   Particle sample(double x);
+  double charge_ratio() { return charge_ratio_; }
 
   // Debug
   void print();

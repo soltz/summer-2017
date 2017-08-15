@@ -190,25 +190,29 @@ int BackgroundGenerator::get_event_mult() {
          &npart, &entropy, &e2);
 
   // TODO: Get correct scale factor and charged to neutral particle ratio
+  double ch_to_n_ratio = f.charge_ratio();
 
   // Compute multiplicity
-  int mult = compute_mult(entropy, 4.65905256, 1.5);
+  int mult = compute_mult(entropy, 4.65905256, ch_to_n_ratio);
 
   return mult;
 }
 
 /* ----------------------------- Particle ---------------------------- */
 
-Particle::Particle(int pid, double mass, std::string name) {
+Particle::Particle(int pid, double mass, std::string name,
+                   std::string charge) {
   pid_ = pid;
   mass_ = mass;
   name_ = name;
+  charge_ = charge;
 }
 
 Particle::Particle(const Particle& that) {
   pid_ = that.pid_;
   mass_ = that.mass_;
   name_ = std::string(that.name_);
+  charge_ = std::string(that.charge_);
   px_ = that.px_;
   py_ = that.py_;
   pz_ = that.pz_;
@@ -217,6 +221,7 @@ Particle::Particle(const Particle& that) {
 Particle& Particle::operator=(const Particle& that) {
   if (this != &that) {
     name_ = std::string(that.name_);
+    charge_ = std::string(that.charge_);
     mass_ = that.mass_;
     pid_ = that.pid_;
     px_ = that.px_;
@@ -239,9 +244,25 @@ CMF::CMF() {
 
 CMF::CMF(std::vector<double> values, std::vector<Particle> particles,
     double temperature) {
+
   v = std::vector<double>(values);
   p = std::vector<Particle>(particles);
   temp = temperature;
+
+  // Compute total to charged particle ratio (before decays)
+  charge_ratio_ = 0.0;
+  for (int i = 0; i < v.size(); i++) {
+    if (p[i].charge() != "0") {
+      if (i == v.size() - 1) {
+        charge_ratio_ += 1.0 - v[i];
+      } else {
+        charge_ratio_ += v[i + 1] - v[i];
+      }
+    }
+  }
+  if (charge_ratio_ != 0.0) {
+    charge_ratio_ = 1.0 / charge_ratio_;
+  }
 }
 
 Particle CMF::sample(double x) {
@@ -442,7 +463,8 @@ CMF generate_cmf(double temp, bool get_new_data) {
       }
 
       // Create particle
-      Particle particle = Particle(id, mass, data[i]["name"]);
+      Particle particle = Particle(id, mass, data[i]["name"],
+                                   data[i]["charge"]);
 
       // Compute density
       double density = particle_density(temp, mass, degen);
