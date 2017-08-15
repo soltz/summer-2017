@@ -18,6 +18,7 @@ After building HepMC, Pythi8, and fastjet to /usr/local/ and installing Boost an
 
 - Must link explicitly against HepMC, Pythia8, and fastjet
 - Must set `std=c++11`
+- Must compile .cpp file used
 
 # To-do
 
