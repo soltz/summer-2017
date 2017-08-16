@@ -10,6 +10,7 @@ std::vector<fastjet::PseudoJet> merge_and_prep(HepMC::GenEvent* evt1,
 
 // Methods to tag and locate unquenched hard photon
 double tag_max_pt_photon(std::vector<fastjet::PseudoJet>& p);
+fastjet::PseudoJet get_max_pt_photon(const std::vector<fastjet::PseudoJet>& p);
 bool contains_tagged_photon(const fastjet::ClusterSequence& clust,
                             const fastjet::PseudoJet& jet);
 int locate_tagged_photon(const fastjet::ClusterSequence& clust,

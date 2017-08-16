@@ -95,6 +95,28 @@ double tag_max_pt_photon(std::vector<fastjet::PseudoJet>& p) {
   }
 }
 
+fastjet::PseudoJet get_max_pt_photon(const std::vector<fastjet::PseudoJet>& p) {
+  int index = -1;
+  double pt = 0;
+
+  // Iterate over PseudoJets in vector
+  for (int i = 0; i < p.size(); i++) {
+    // If harder photon located, keep its index
+    if ((p[i].user_index() == 22) && (p[i].pt() > pt)) {
+      // Flag current max photon user index
+      index = i;
+      pt = p[i].pt();
+    }
+  }
+
+  // Return hard photon PseudoJet or 0 Jet if none found
+  if (index != -1) {
+    return fastjet::PseudoJet(p[index]);
+  } else {
+    return fastjet::PseudoJet(0.0, 0.0, 0.0, 0.0);
+  }
+}
+
 bool contains_tagged_photon(const fastjet::ClusterSequence& clust,
                             const fastjet::PseudoJet& jet) {
   std::vector<fastjet::PseudoJet> jet_const = clust.constituents(jet);
