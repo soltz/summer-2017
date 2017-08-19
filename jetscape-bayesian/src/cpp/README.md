@@ -1,6 +1,6 @@
 # Dependencies
 
-- [HepMC](http://hepmc.web.cern.ch/hepmc/)
+- [HepMC2](http://hepmc.web.cern.ch/hepmc/)
 - [Pythia8](http://home.thep.lu.se/~torbjorn/Pythia.html)
 - [fastjet](http://fastjet.fr/)
 - [Boost](http://www.boost.org/)
@@ -17,6 +17,7 @@ After building HepMC, Pythi8, and fastjet to /usr/local/ and installing Boost an
 # Compiling
 
 - Must link explicitly against HepMC, Pythia8, and fastjet
+- JSON and Boost should be in `/usr/local/Cellar/` (link against these if this isn't in your default search directory)
 - Must set `std=c++11`
 - Must compile .cpp file used
 
