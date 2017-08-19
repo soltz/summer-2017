@@ -557,7 +557,7 @@ CMF generate_cmf(double temp, bool get_new_data) {
 
     // Skip over partons, some bosons, and K0
     // Draw mass cutoff at 2.5
-    if ((std::abs(id) >= 23) && (std::abs(id) != 311) && (mass <= 2.5)) {
+    if (((std::abs(id) >= 100) && (std::abs(id) != 311) && (mass <= 2.5))) {
 
       // Get degeneracy based on pid meaning
       int degen = std::abs(id) % 10;
