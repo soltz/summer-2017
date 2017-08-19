@@ -189,9 +189,31 @@ int BackgroundGenerator::get_event_mult() {
 
   // TODO: Get correct scale factor and charged to neutral particle ratio
   double ch_to_n_ratio = f.charge_ratio();
+  double scale_factor = 0.0;
+
+  if (energy_ == 200.0) {
+    scale_factor = 4.65905256;
+  } else if (energy_ == 130.0) {
+    scale_factor = 3.96639009;
+  } else if (energy_ == 62.4) {
+    scale_factor = 3.13381932;
+  } else if (energy_ == 39.0) {
+    scale_factor = 2.54804101;
+  } else if (energy_ == 27.0) {
+    scale_factor = 2.16041632;
+  } else if (energy_ == 19.6) {
+    scale_factor = 1.95015905;
+  } else if (energy_ == 15.0) {
+    scale_factor = 1.6460897;
+  } else if (energy_ == 7.7) {
+    scale_factor = 1.27382896;
+  } else {
+    std::cout << "Invalid energy " << energy_ << std::endl;
+    exit(1);
+  }
 
   // Compute multiplicity
-  int mult = compute_mult(entropy, 4.65905256, ch_to_n_ratio);
+  int mult = compute_mult(entropy, scale_factor, ch_to_n_ratio);
 
   return mult;
 }
