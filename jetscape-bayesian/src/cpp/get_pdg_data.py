@@ -136,8 +136,8 @@ switch_charge = {'++': '--', '+': '-', '0': '0', '-': '+', '--': '++',
                  '-1/3': '+1/3', '+2/3': '-2/3'}
 
 # Remove header lines and reformat data
-# data = {}
 data = []
+data_dict = {}
 for x in content:
     x = x.decode('utf-8')
     if x[0] != '*':
@@ -155,6 +155,7 @@ for x in content:
                 # temp_data = [line[0][i]] + line[1:6] + [line[6][i]]
                 # data[temp_data['pid']] = temp_data
                 data.append(temp_data)
+                data_dict[temp_data['pid']] = temp_data
 
                 if has_anti_particle(line[0][i]):
                     # print('Anti-particle found: {} - {} / charge: {}'.format(line[0][i], line[5], line[6][i]))
@@ -168,7 +169,11 @@ for x in content:
                     temp_data['charge'] = switch_charge[line[6][i]]
                     # data[temp_data['pid']] = temp_data
                     data.append(temp_data)
+                    data_dict[temp_data['pid']] = temp_data
 
 # Save JSON file
 with open('{}/mass_width.json'.format(save_dir), 'w') as f:
     json.dump(data, f)
+
+with open('{}/mass_width_dict.json'.format(save_dir), 'w') as f:
+    json.dump(data_dict, f)
