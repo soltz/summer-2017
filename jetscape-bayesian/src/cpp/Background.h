@@ -104,7 +104,7 @@ Members:
     vector of particles with positions corresponding to values in v
   temp :
     temperature of freezeout used to sample momenta
-  charge_ratio :
+  charge_ratio (with accessor) :
     ratio of total particles to charged particles
 
 Methods:
@@ -116,6 +116,8 @@ Methods:
     returns a particle with sampled momenta based on a value on [0, 1]. For a
     value x, returns a particle corresponding to the index
     where v[index] <= x < v[index + 1] (edge case handle appropriately)
+  void generate_charge_ratio(int) :
+    method to run MC calculation of the charge ratio
   void print() :
     prints the values of the CMF and their associated particles
 
@@ -141,6 +143,7 @@ public:
 
   // Methods
   Particle sample(double x);
+  void generate_charge_ratio(int n);
   double charge_ratio() { return charge_ratio_; }
 
   // Debug
