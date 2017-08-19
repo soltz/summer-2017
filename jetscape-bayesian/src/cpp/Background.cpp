@@ -321,6 +321,52 @@ Particle CMF::sample(double x) {
   return part;
 }
 
+void CMF::generate_charge_ratio(int n) {
+  Pythia8::Pythia pythia;
+
+  // Set up PYTHIA to do decays
+  pythia.readString("Print:quiet = on");
+  pythia.readString("ProcessLevel:all = off");
+  pythia.readString("Init:showChangedSettings = off");
+  pythia.readString("Init:showChangedParticleData = off");
+  pythia.readString("ParticleDecays:limitTau0 = on");
+  pythia.readString("Next:numberCount = 0");
+
+  // Disable pi0 decays
+  pythia.particleData.mayDecay(111, false);
+
+  // Initialize PYTHIA with given settings
+  pythia.init();
+
+  pythia.event.reset();
+
+  for (int i = 0; i < n; i++) {
+    // Sample particle from previously computed CMF
+    double n = ((double) rand() / (RAND_MAX));
+    Particle a = sample(n);
+
+    // Add particle to PYTHIA
+    pythia.event.append(a.pid(), 1, 0, 0, a.px(), a.py(),
+                        a.pz(), a.e(), a.mass());
+  }
+
+  pythia.next();
+
+  int num_charged = 0;
+  int num_total = 0;
+  for (int i = 0; i < pythia.event.size(); i++) {
+    // if (pythia.event[i].isFinal()) {
+    if ((pythia.event[i].isFinal()) && (pythia.event[i].id() != 22)) {
+      num_total++;
+      if (pythia.event[i].isCharged()) {
+        num_charged++;
+      }
+    }
+  }
+  charge_ratio_ = ((double) num_total) / ((double) num_charged);
+  std::cout << charge_ratio_ << std::endl;
+}
+
 void CMF::print() {
 
   // Iterate over particles
