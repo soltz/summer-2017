@@ -47,3 +47,12 @@ pythia/
 data/
 fudge/
 fastjet/
+pyhepmc-0.5.0/
+hepmc-build/
+hepmc/
+
+# Latex #
+#########
+*.aux
+*.out
+*eps-converted-to.pdf
