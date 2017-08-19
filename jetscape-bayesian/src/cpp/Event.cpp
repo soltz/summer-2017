@@ -86,9 +86,13 @@ void EventGenerator::init(double energy, std::string save_dir,
   pythia.readString("Print:quiet = on");
   pythia.readString("HardQCD:all = on");
   pythia.readString("PromptPhoton:all = on");
+  pythia.readString("ParticleDecays:limitTau0 = on");
   pythia.readString("Random:setseed = on");
   pythia.readString("Random:seed = 0");
   pythia.readString("Beams:eCM = " + std::to_string(energy));
+
+  // Disable pi0 decays
+  pythia.particleData.mayDecay(111, false);
 
   // Add custom options
   for (int i = 0; i < options.size(); i++) {
