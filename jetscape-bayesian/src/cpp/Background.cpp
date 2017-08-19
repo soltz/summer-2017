@@ -97,7 +97,11 @@ void BackgroundGenerator::init(std::string p1, std::string p2, double energy,
   pythia.readString("ProcessLevel:all = off");
   pythia.readString("Init:showChangedSettings = off");
   pythia.readString("Init:showChangedParticleData = off");
+  pythia.readString("ParticleDecays:limitTau0 = on");
   pythia.readString("Next:numberCount = 0");
+
+  // Disable pi0 decays
+  pythia.particleData.mayDecay(111, false);
 
   // Initialize PYTHIA with given settings
   pythia.init();
