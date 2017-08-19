@@ -83,6 +83,9 @@ void BackgroundGenerator::init(std::string p1, std::string p2, double energy,
   // Generate CMF and save for later use
   f = generate_cmf(temp);
 
+  // Run Monte Carlo for charge ratio
+  f.generate_charge_ratio(1000000);
+
   // Save energy
   energy_ = energy;
 
