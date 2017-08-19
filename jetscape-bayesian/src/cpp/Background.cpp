@@ -149,9 +149,13 @@ void BackgroundGenerator::gen_event(HepMC::GenEvent* evt, int mult) {
   // Reset PYTHIA object
   pythia.event.reset();
 
+  // Get mult range
+  int mult_min = ceil(0.95 * mult);
+  int mult_max = ceil(1.1 * mult);
+  int mult_actual = 0;
+  int index = 0;
 
-  // Loop over multiplicity
-  for (int i = 0; i < mult; i++) {
+  while (mult_actual < mult_min) {
     // Sample particle from previously computed CMF
     double n = ((double) rand() / (RAND_MAX));
     Particle a = f.sample(n);
@@ -159,21 +163,32 @@ void BackgroundGenerator::gen_event(HepMC::GenEvent* evt, int mult) {
     // Add particle to PYTHIA
     pythia.event.append(a.pid(), 1, 0, 0, a.px(), a.py(),
                         a.pz(), a.e(), a.mass());
+
+    // Run PYTHIA to do the decays
+    pythia.next();
+
+    for (int i = index; i < pythia.event.size(); i++) {
+      if (pythia.event[i].isFinal()) {
+        mult_actual++;
+      }
+    }
+    index = pythia.event.size();
   }
 
-  // Run PYTHIA to do the decays
-  pythia.next();
+  if (mult_actual > mult_max) {
+    gen_event(evt, mult);
+  } else {
+    // Convert PYTHIA event to HepMC::GenEvent object
+    HepMC::Pythia8ToHepMC converter;
+    converter.fill_next_event(pythia, evt);
 
-  // Convert PYTHIA event to HepMC::GenEvent object
-  HepMC::Pythia8ToHepMC converter;
-  converter.fill_next_event(pythia, evt);
+    // For debugging
+    // pythia.event.list();
+    // bg_evt->print();
 
-  // For debugging
-  // pythia.event.list();
-  // bg_evt->print();
-
-  // Reset PYTHIA object
-  pythia.event.reset();
+    // Reset PYTHIA object
+    pythia.event.reset();
+  }
 }
 
 int BackgroundGenerator::get_event_mult() {
