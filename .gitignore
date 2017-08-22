@@ -47,6 +47,7 @@ pythia/
 data/
 fudge/
 fastjet/
+<<<<<<< HEAD
 fudge*/
 
 # Package Build/Install Directories #
@@ -54,4 +55,12 @@ fudge*/
 *.egg-info/
 build/
 dist/
+pyhepmc-0.5.0/
+hepmc-build/
+hepmc/
 
+# Latex #
+#########
+*.aux
+*.out
+*eps-converted-to.pdf
