@@ -52,8 +52,10 @@ class HEPData_Manager(object):
         # Save JSON digest
         digest_url = self.json_url.format(inspire_id)
         digest_file = '{}/digest.json'.format(data_dir)
-        with urlopen(digest_url) as response, open(digest_file, 'wb') as out:
+        response = urlopen(digest_url)
+        with open(digest_file, 'wb') as out:
             copyfileobj(response, out)
+        response.close()
         # Parse out most recent archive of data and current version
         with open(digest_file) as in_file:
             data = json.load(in_file)
@@ -61,15 +63,19 @@ class HEPData_Manager(object):
         version = int(targz_url.split('/')[-2])
         # Save *.tar.gz file
         targz_file = '{}/submission.tar.gz'.format(data_dir)
-        with urlopen(targz_url) as response, open(targz_file, 'wb') as out:
+        response = urlopen(targz_url)
+        with open(targz_file, 'wb') as out:
             copyfileobj(response, out)
+        response.close()
         # Open *.tar.gz file and extract out tables and submission data
         tar = tarfile.open(targz_file, "r:gz")
         for x in tar.getmembers()[1:]:
             name = x.name.split('/', 1)[1]
             x_path = '{}/{}'.format(data_dir, name)
-            with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
+            tarf = tar.extractfile(x)
+            with open(x_path, 'wb') as out:
                 copyfileobj(tarf, out)
+            tarf.close()
         tar.close()
         # Go through all versions and save those in respective directories
         for i in range(version):
@@ -78,14 +84,18 @@ class HEPData_Manager(object):
             _create_dir(version_dir)
             targz_url = self.targz_url.format(inspire_id, i, data_format)
             targz_file = '{}/submission.tar.gz'.format(version_dir)
-            with urlopen(targz_url) as response, open(targz_file, 'wb') as out:
+            response = urlopen(targz_url)
+            with open(targz_file, 'wb') as out:
                 copyfileobj(response, out)
+            response.close()
             tar = tarfile.open(targz_file, "r:gz")
             for x in tar.getmembers()[1:]:
                 name = x.name.split('/', 1)[1]
                 x_path = '{}/{}'.format(version_dir, name)
-                with tar.extractfile(x) as tarf, open(x_path, 'wb') as out:
+                tarf = tar.extractfile(x)
+                with open(x_path, 'wb') as out:
                     copyfileobj(tarf, out)
+                tarf.close()
             tar.close()
 
     def remove_data(self, inspire_id):
