@@ -47,7 +47,6 @@ pythia/
 data/
 fudge/
 fastjet/
-<<<<<<< HEAD
 fudge*/
 
 # Package Build/Install Directories #
