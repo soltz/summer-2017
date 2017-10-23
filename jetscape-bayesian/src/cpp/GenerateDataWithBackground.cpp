@@ -52,7 +52,8 @@ int main(void) {
   // Create HepMC obj for data
   HepMC::GenEvent* jet_evt = new HepMC::GenEvent();
   HepMC::GenEvent* bg_evt = new HepMC::GenEvent();
-  for (double quench = 1.0; quench >= 0.15; quench -= 0.05) {
+  for (double quench = 1.0; quench >= 0.96; quench -= 0.05) {
+  //  for (double quench = 1.0; quench >= 0.15; quench -= 0.05) {
     std::cout << "quench = " << quench << "\n";
     std::vector<EventData> d;
     d.reserve(1000);
