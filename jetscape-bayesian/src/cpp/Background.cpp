@@ -408,15 +408,21 @@ void save_pdg_data(void) {
 }
 
 /*
-Function to sample particle 3-momentum from a 3-D Boltzmann distribution
+Function to sample particle 3-momentum according to:
+  2-D Boltzmann distribution in mT
+  flat in rapidity
+  flat in phi
 */
 void sample_momenta(Particle* p, double temp) {
 
   // Get particle mass
   double mass = (*p).mass();
 
+  // Set rapidity range (-ymax < y < +ymax)
+  double ymax = 1.0;
+
   // Loop until Boltzman distribution is satisfied
-  double r1, r2, r3, b_sample, pmag, e, ctheta, stheta, phi;
+  double r1, r2, r3, b_sample, pT, mT, y, phi;
   do {
     // Sample four random numbers
     r1 = ((double) rand() / (RAND_MAX));
@@ -424,17 +430,16 @@ void sample_momenta(Particle* p, double temp) {
     r3 = ((double) rand() / (RAND_MAX));
     b_sample = ((double) rand() / (RAND_MAX));
 
-    // Compute 3-momentum magnitude
-    pmag = -1 * temp * log(r1 * r2 * r3);
+    // Compute pT
+    pT = -1 * temp * log(r1 * r2);
 
-    // Compute energy
-    e = sqrt(pmag * pmag + mass * mass);
-  } while (b_sample >= exp((pmag - e) / temp));
+    // Compute mT
+    mT = sqrt(pT * pT + mass * mass);
+  } while (b_sample >= exp((pT - mT) / temp));
 
   // Compute angles based on random numbers
-  ctheta = log(r1 / r2) / log(r1 * r2);
-  stheta = sqrt(1 - ctheta * ctheta);
-  phi = temp * temp * pow(log(r1 * r2), 2) / (pmag * pmag);
+  y = ymax*(r3-0.5);
+  phi = temp * temp * pow(log(r1 * r2), 2) / (pT * pT);
   if (phi > 1.0) {
     printf("phi = %lf, out of range\n", phi);
     // TODO raise error here
@@ -442,9 +447,9 @@ void sample_momenta(Particle* p, double temp) {
   phi *= 2.0 * M_PI;
 
   // Set particle 3-momentum
-  (*p).pz(pmag * ctheta);
-  (*p).px(pmag * stheta * cos(phi));
-  (*p).py(pmag * stheta * sin(phi));
+  (*p).px(pT * cos(phi));
+  (*p).py(pT * sin(phi));
+  (*p).pz(mass * sinh(y));
 }
 
 /*
