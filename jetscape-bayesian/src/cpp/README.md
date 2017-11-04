@@ -19,7 +19,8 @@ After building HepMC, Pythi8, and fastjet to /usr/local/ and installing Boost an
 - Must link explicitly against HepMC, Pythia8, and fastjet
 - JSON and Boost should be in `/usr/local/Cellar/` (link against these if this isn't in your default search directory)
 - Must set `std=c++11`
-- Must compile .cpp file used
+- Must compile .cpp file used 
+- Compilation is now handled by a Makefile (RAS 2017-nov-02)
 
 # To-do
 
